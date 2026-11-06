@@ -1,0 +1,24 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Paiements mobiles · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Paiements mobiles</h1>
+<p class="lead">Les paiements Orange Money et MTN MoMo (simulation) des membres de la tontine. Chaque paiement réussi enregistre la cotisation ou règle la pénalité.</p>
+<div class="grille-kpi grille-deux">
+  {% for cle, libelle in OPERATEURS.items() %}
+  <article class="carte kpi"><span class="mut">{{ libelle }} · paiements réussis</span>
+    <strong>{{ (totaux[cle].total if cle in totaux else 0)|fcfa }}</strong>
+    <span class="mut">{{ totaux[cle].nb if cle in totaux else 0 }} paiement{{ 's' if cle in totaux and totaux[cle].nb > 1 }}</span></article>
+  {% endfor %}
+</div>
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Date</th><th scope="col">Membre</th><th scope="col">Référence</th><th scope="col">Moyen</th><th scope="col">Compte</th><th scope="col">Montant</th><th scope="col">Statut</th></tr></thead>
+    <tbody>
+    {% for p in paiements %}
+      <tr><td>{{ p.date_creation|horodatage }}</td><td>{{ p.nom }}</td><td>{{ p.reference }}</td><td><span class="badge operateur-{{ p.operateur }}">{{ OPERATEURS[p.operateur] }}</span></td><td>{{ p.telephone }}</td><td>{{ p.montant|fcfa }}</td>
+        <td><span class="badge {{ 'vert' if p.statut == 'reussi' else 'rouge' if p.statut == 'echoue' else 'or' }}">{{ STATUTS_PAIEMENT[p.statut] }}</span></td></tr>
+    {% else %}<tr><td colspan="7">Aucun paiement pour le moment.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

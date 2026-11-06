@@ -1,0 +1,52 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Cotisations de la séance {{ seance.numero }} · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Cotisations de la séance n° {{ seance.numero }}</h1>
+<p class="lead">{{ seance.date|date_fr }} · cotisation de {{ cycle.montant_cotisation|fcfa }} par membre.</p>
+{% if not passee %}<p class="bandeau-lecture">Cette séance n'a pas encore eu lieu : aucune cotisation ne peut être enregistrée.</p>
+{% elif cycle.statut != 'en_cours' %}<p class="bandeau-lecture">Le cycle n'est pas en cours : aucune cotisation ne peut être enregistrée.</p>{% endif %}
+
+<div class="grille-kpi" id="etat-direct" data-api="{{ url_for('api_etat_seance', id_tontine=tontine.id, id_seance=seance.id) }}"
+     data-montant="{{ cycle.montant_cotisation }}" data-enregistre="{{ etat.total_collecte }}" data-attendu="{{ etat.attendu }}">
+  <article class="carte kpi"><span class="mut">Total collecté (en direct)</span><strong id="total-direct">{{ etat.total_collecte|fcfa }}</strong></article>
+  <article class="carte kpi"><span class="mut">Attendu pour la séance</span><strong>{{ etat.attendu|fcfa }}</strong></article>
+  <article class="carte kpi alerte"><span class="mut">Retardataires (en direct)</span><strong id="retard-direct">{{ etat.nb_retardataires }}</strong></article>
+  <article class="carte kpi"><span class="mut">Déjà enregistré sur le serveur</span><strong id="etat-serveur">{{ etat.total_collecte|fcfa }}</strong></article>
+</div>
+
+<form id="form-cotisations" method="post" action="{{ url_for('enregistrer_cotisations', id_tontine=tontine.id, id_seance=seance.id) }}" novalidate>
+  <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+  {% if saisie %}<div class="actions-barre"><button class="btn ghost petit" type="button" id="tout-cocher">Tout cocher</button></div>{% endif %}
+  <div class="tableau-defile">
+    <table class="table-saisie">
+      <thead><tr><th scope="col">A payé</th><th scope="col">Membre</th><th scope="col">Montant (FCFA)</th><th scope="col">Mode</th><th scope="col">Date de paiement</th><th scope="col">Statut</th></tr></thead>
+      <tbody>
+      {% for m in lignes %}
+        <tr{% if m.cotisation_id %} class="enregistre"{% endif %}>
+          <td>
+            <input type="checkbox" id="paye-{{ m.id }}" name="paye" value="{{ m.id }}"{% if m.cotisation_id %} checked disabled{% elif not saisie %} disabled{% endif %}>
+            <label class="sr-only" for="paye-{{ m.id }}">{{ m.nom }} a payé</label>
+          </td>
+          <td>{{ m.nom }}</td>
+          {% if m.cotisation_id %}
+          <td>{{ m.montant|fcfa }}</td><td>{{ MODES[m.mode] }}</td><td>{{ m.date_paiement|date_fr }}</td>
+          <td><span class="badge vert">Enregistrée</span></td>
+          {% else %}
+          <td><label class="sr-only" for="montant-{{ m.id }}">Montant de {{ m.nom }}</label>
+            <input id="montant-{{ m.id }}" name="montant_{{ m.id }}" type="number" value="{{ cycle.montant_cotisation }}" readonly class="champ-montant"></td>
+          <td><label class="sr-only" for="mode-{{ m.id }}">Mode de paiement de {{ m.nom }}</label>
+            <select id="mode-{{ m.id }}" name="mode_{{ m.id }}"{% if not saisie %} disabled{% endif %}>{% for cle, libelle in MODES.items() %}<option value="{{ cle }}">{{ libelle }}</option>{% endfor %}</select></td>
+          <td><label class="sr-only" for="date-{{ m.id }}">Date de paiement de {{ m.nom }}</label>
+            <input id="date-{{ m.id }}" name="date_{{ m.id }}" type="date" value="{{ aujourdhui }}" max="{{ aujourdhui }}"{% if not saisie %} disabled{% endif %}></td>
+          <td><span class="badge rouge">Non payé</span></td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="erreur-champ" id="err-cotisations" role="alert"></p>
+  {% if saisie %}<button class="btn" type="submit">Enregistrer les cotisations cochées</button>{% endif %}
+</form>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/cotisations.js') }}" defer></script>{% endblock %}

@@ -1,0 +1,1361 @@
+BEGIN TRANSACTION;
+CREATE TABLE adhesions (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    tontine_id     INTEGER NOT NULL REFERENCES tontines (id),
+    utilisateur_id INTEGER NOT NULL REFERENCES utilisateurs (id),
+    role           TEXT    NOT NULL DEFAULT 'membre' CHECK (role IN ('membre', 'tresorier', 'president')),
+    statut         TEXT    NOT NULL DEFAULT 'active'
+                   CHECK (statut IN ('en_attente', 'active', 'quittee', 'refusee')),
+    date_adhesion  TEXT    NOT NULL,
+    UNIQUE (tontine_id, utilisateur_id)
+);
+INSERT INTO "adhesions" VALUES(1,1,1,'president','active','2025-10-27');
+INSERT INTO "adhesions" VALUES(2,1,2,'tresorier','active','2025-10-15');
+INSERT INTO "adhesions" VALUES(3,1,3,'membre','active','2025-10-29');
+INSERT INTO "adhesions" VALUES(4,1,4,'membre','active','2025-11-09');
+INSERT INTO "adhesions" VALUES(5,1,5,'membre','active','2025-10-16');
+INSERT INTO "adhesions" VALUES(6,1,6,'membre','active','2025-10-09');
+INSERT INTO "adhesions" VALUES(7,1,7,'membre','active','2025-11-07');
+INSERT INTO "adhesions" VALUES(8,1,8,'membre','active','2025-11-10');
+INSERT INTO "adhesions" VALUES(9,1,9,'membre','active','2025-10-10');
+INSERT INTO "adhesions" VALUES(10,1,10,'membre','active','2025-11-13');
+INSERT INTO "adhesions" VALUES(11,1,11,'membre','active','2025-11-08');
+INSERT INTO "adhesions" VALUES(12,1,12,'membre','active','2025-10-29');
+INSERT INTO "adhesions" VALUES(13,1,13,'membre','active','2025-11-03');
+INSERT INTO "adhesions" VALUES(14,1,14,'membre','active','2025-10-18');
+INSERT INTO "adhesions" VALUES(15,1,15,'membre','active','2025-10-13');
+INSERT INTO "adhesions" VALUES(16,1,16,'membre','active','2025-10-14');
+INSERT INTO "adhesions" VALUES(17,1,17,'membre','active','2025-10-31');
+INSERT INTO "adhesions" VALUES(18,1,18,'membre','active','2025-10-19');
+INSERT INTO "adhesions" VALUES(19,1,19,'membre','active','2025-11-10');
+INSERT INTO "adhesions" VALUES(20,1,20,'membre','active','2025-11-03');
+INSERT INTO "adhesions" VALUES(21,1,21,'membre','active','2025-10-20');
+INSERT INTO "adhesions" VALUES(22,1,22,'membre','active','2025-11-13');
+INSERT INTO "adhesions" VALUES(23,1,23,'membre','active','2025-10-20');
+INSERT INTO "adhesions" VALUES(24,1,24,'membre','active','2025-10-28');
+INSERT INTO "adhesions" VALUES(25,1,25,'membre','active','2025-10-15');
+INSERT INTO "adhesions" VALUES(26,2,4,'president','active','2026-09-06');
+INSERT INTO "adhesions" VALUES(27,2,5,'tresorier','active','2026-08-18');
+INSERT INTO "adhesions" VALUES(28,2,6,'membre','active','2026-09-11');
+INSERT INTO "adhesions" VALUES(29,2,7,'membre','active','2026-09-01');
+INSERT INTO "adhesions" VALUES(30,2,8,'membre','active','2026-09-17');
+INSERT INTO "adhesions" VALUES(31,2,9,'membre','active','2026-09-08');
+INSERT INTO "adhesions" VALUES(32,2,26,'membre','active','2026-08-31');
+INSERT INTO "adhesions" VALUES(33,2,27,'membre','active','2026-09-08');
+INSERT INTO "adhesions" VALUES(34,2,28,'membre','active','2026-09-03');
+INSERT INTO "adhesions" VALUES(35,2,29,'membre','active','2026-08-27');
+INSERT INTO "adhesions" VALUES(36,2,30,'membre','active','2026-09-01');
+INSERT INTO "adhesions" VALUES(37,2,31,'membre','active','2026-08-30');
+INSERT INTO "adhesions" VALUES(38,2,23,'membre','quittee','2026-07-24');
+INSERT INTO "adhesions" VALUES(39,3,32,'president','active','2026-09-07');
+INSERT INTO "adhesions" VALUES(40,3,33,'tresorier','active','2026-09-09');
+INSERT INTO "adhesions" VALUES(41,3,34,'membre','active','2026-09-05');
+INSERT INTO "adhesions" VALUES(42,3,10,'membre','active','2026-10-14');
+INSERT INTO "adhesions" VALUES(43,3,11,'membre','active','2026-09-27');
+INSERT INTO "adhesions" VALUES(44,3,35,'membre','en_attente','2026-10-22');
+INSERT INTO "adhesions" VALUES(45,3,36,'membre','en_attente','2026-10-21');
+INSERT INTO "adhesions" VALUES(46,3,37,'membre','en_attente','2026-10-19');
+INSERT INTO "adhesions" VALUES(47,3,12,'membre','en_attente','2026-10-18');
+INSERT INTO "adhesions" VALUES(48,3,21,'membre','refusee','2026-10-17');
+INSERT INTO "adhesions" VALUES(49,4,38,'president','active','2025-12-24');
+INSERT INTO "adhesions" VALUES(50,4,4,'tresorier','active','2025-12-24');
+INSERT INTO "adhesions" VALUES(51,4,39,'membre','active','2026-01-13');
+INSERT INTO "adhesions" VALUES(52,4,13,'membre','active','2026-01-09');
+INSERT INTO "adhesions" VALUES(53,4,14,'membre','active','2025-12-28');
+INSERT INTO "adhesions" VALUES(54,4,15,'membre','active','2025-12-16');
+INSERT INTO "adhesions" VALUES(55,4,16,'membre','active','2026-01-14');
+INSERT INTO "adhesions" VALUES(56,4,17,'membre','active','2025-12-17');
+CREATE TABLE contributions_evenement (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    evenement_id      INTEGER NOT NULL REFERENCES evenements (id),
+    adhesion_id       INTEGER NOT NULL REFERENCES adhesions (id),
+    montant           INTEGER NOT NULL CHECK (montant > 0),
+    date_contribution TEXT    NOT NULL,
+    mode              TEXT    NOT NULL CHECK (mode IN ('especes', 'mobile_money')),
+    paiement_id       INTEGER REFERENCES paiements (id),
+    enregistre_par    INTEGER REFERENCES adhesions (id)  -- renseigné quand le bureau a noté une contribution en espèces
+);
+INSERT INTO "contributions_evenement" VALUES(1,1,4,20000,'2026-10-23','especes',NULL,1);
+INSERT INTO "contributions_evenement" VALUES(2,1,3,5000,'2026-10-21','mobile_money',168,NULL);
+INSERT INTO "contributions_evenement" VALUES(3,1,6,5000,'2026-10-21','mobile_money',169,NULL);
+INSERT INTO "contributions_evenement" VALUES(4,1,22,2000,'2026-10-18','mobile_money',170,NULL);
+INSERT INTO "contributions_evenement" VALUES(5,1,10,5000,'2026-10-20','especes',NULL,1);
+INSERT INTO "contributions_evenement" VALUES(6,1,20,5000,'2026-10-19','mobile_money',171,NULL);
+INSERT INTO "contributions_evenement" VALUES(7,1,2,10000,'2026-10-21','mobile_money',172,NULL);
+INSERT INTO "contributions_evenement" VALUES(8,1,7,5000,'2026-10-23','mobile_money',173,NULL);
+INSERT INTO "contributions_evenement" VALUES(9,1,11,5000,'2026-10-19','mobile_money',174,NULL);
+INSERT INTO "contributions_evenement" VALUES(10,1,5,5000,'2026-10-21','mobile_money',175,NULL);
+INSERT INTO "contributions_evenement" VALUES(11,1,19,2000,'2026-10-16','mobile_money',176,NULL);
+INSERT INTO "contributions_evenement" VALUES(12,1,12,20000,'2026-10-18','especes',NULL,1);
+INSERT INTO "contributions_evenement" VALUES(13,1,25,5000,'2026-10-17','mobile_money',177,NULL);
+INSERT INTO "contributions_evenement" VALUES(14,1,23,5000,'2026-10-21','mobile_money',178,NULL);
+INSERT INTO "contributions_evenement" VALUES(15,2,16,1000,'2026-10-23','mobile_money',179,NULL);
+INSERT INTO "contributions_evenement" VALUES(16,2,5,2000,'2026-10-16','mobile_money',180,NULL);
+INSERT INTO "contributions_evenement" VALUES(17,2,11,2000,'2026-10-22','mobile_money',181,NULL);
+INSERT INTO "contributions_evenement" VALUES(18,2,3,2000,'2026-10-20','especes',NULL,2);
+INSERT INTO "contributions_evenement" VALUES(19,2,8,5000,'2026-10-19','especes',NULL,2);
+INSERT INTO "contributions_evenement" VALUES(20,2,12,2000,'2026-10-20','mobile_money',182,NULL);
+INSERT INTO "contributions_evenement" VALUES(21,2,23,2000,'2026-10-22','mobile_money',183,NULL);
+INSERT INTO "contributions_evenement" VALUES(22,2,6,1000,'2026-10-17','mobile_money',184,NULL);
+INSERT INTO "contributions_evenement" VALUES(23,2,22,2000,'2026-10-23','mobile_money',185,NULL);
+INSERT INTO "contributions_evenement" VALUES(24,2,19,5000,'2026-10-19','mobile_money',186,NULL);
+INSERT INTO "contributions_evenement" VALUES(25,2,21,5000,'2026-10-22','especes',NULL,2);
+INSERT INTO "contributions_evenement" VALUES(26,2,1,5000,'2026-10-20','especes',NULL,2);
+INSERT INTO "contributions_evenement" VALUES(27,2,24,2000,'2026-10-19','mobile_money',187,NULL);
+INSERT INTO "contributions_evenement" VALUES(28,2,4,5000,'2026-10-21','mobile_money',188,NULL);
+INSERT INTO "contributions_evenement" VALUES(29,2,20,1000,'2026-10-21','mobile_money',189,NULL);
+INSERT INTO "contributions_evenement" VALUES(30,2,2,1000,'2026-10-18','especes',NULL,2);
+INSERT INTO "contributions_evenement" VALUES(31,2,18,2000,'2026-10-19','mobile_money',190,NULL);
+INSERT INTO "contributions_evenement" VALUES(32,2,13,2000,'2026-10-16','mobile_money',191,NULL);
+INSERT INTO "contributions_evenement" VALUES(33,3,6,2000,'2026-10-16','mobile_money',192,NULL);
+INSERT INTO "contributions_evenement" VALUES(34,3,7,1000,'2026-10-19','especes',NULL,1);
+INSERT INTO "contributions_evenement" VALUES(35,3,24,5000,'2026-10-22','mobile_money',193,NULL);
+INSERT INTO "contributions_evenement" VALUES(36,3,2,5000,'2026-10-23','mobile_money',194,NULL);
+INSERT INTO "contributions_evenement" VALUES(37,3,8,2000,'2026-10-19','mobile_money',195,NULL);
+INSERT INTO "contributions_evenement" VALUES(38,3,22,2000,'2026-10-19','especes',NULL,1);
+INSERT INTO "contributions_evenement" VALUES(39,3,15,2000,'2026-10-19','especes',NULL,1);
+INSERT INTO "contributions_evenement" VALUES(40,3,20,5000,'2026-10-19','mobile_money',196,NULL);
+INSERT INTO "contributions_evenement" VALUES(41,3,12,2000,'2026-10-17','especes',NULL,1);
+INSERT INTO "contributions_evenement" VALUES(42,3,23,5000,'2026-10-20','mobile_money',197,NULL);
+INSERT INTO "contributions_evenement" VALUES(43,4,28,1000,'2026-10-16','mobile_money',236,NULL);
+INSERT INTO "contributions_evenement" VALUES(44,4,35,1000,'2026-10-18','mobile_money',237,NULL);
+INSERT INTO "contributions_evenement" VALUES(45,4,36,5000,'2026-10-17','mobile_money',238,NULL);
+INSERT INTO "contributions_evenement" VALUES(46,4,37,1000,'2026-10-21','mobile_money',239,NULL);
+INSERT INTO "contributions_evenement" VALUES(47,4,33,5000,'2026-10-21','especes',NULL,26);
+INSERT INTO "contributions_evenement" VALUES(48,4,34,2000,'2026-10-23','mobile_money',240,NULL);
+INSERT INTO "contributions_evenement" VALUES(49,5,53,5000,'2026-10-23','especes',NULL,49);
+INSERT INTO "contributions_evenement" VALUES(50,5,51,5000,'2026-10-21','especes',NULL,49);
+INSERT INTO "contributions_evenement" VALUES(51,5,52,5000,'2026-10-22','mobile_money',276,NULL);
+INSERT INTO "contributions_evenement" VALUES(52,5,55,5000,'2026-10-16','especes',NULL,49);
+INSERT INTO "contributions_evenement" VALUES(53,5,49,5000,'2026-10-16','especes',NULL,49);
+INSERT INTO "contributions_evenement" VALUES(54,5,54,5000,'2026-10-18','mobile_money',277,NULL);
+CREATE TABLE cotisations (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    seance_id     INTEGER NOT NULL REFERENCES seances (id),
+    adhesion_id   INTEGER NOT NULL REFERENCES adhesions (id),
+    montant       INTEGER NOT NULL CHECK (montant > 0),
+    date_paiement TEXT    NOT NULL,
+    mode          TEXT    NOT NULL CHECK (mode IN ('especes', 'mobile_money')),
+    paiement_id   INTEGER REFERENCES paiements (id),  -- renseigné quand la cotisation vient d'un paiement en ligne
+    UNIQUE (seance_id, adhesion_id)
+);
+INSERT INTO "cotisations" VALUES(1,1,1,25000,'2025-11-12','mobile_money',1);
+INSERT INTO "cotisations" VALUES(2,1,2,25000,'2025-11-13','mobile_money',2);
+INSERT INTO "cotisations" VALUES(3,1,3,25000,'2025-11-10','especes',NULL);
+INSERT INTO "cotisations" VALUES(4,1,4,25000,'2025-11-10','mobile_money',3);
+INSERT INTO "cotisations" VALUES(5,1,5,25000,'2025-11-11','mobile_money',4);
+INSERT INTO "cotisations" VALUES(6,1,7,25000,'2025-11-13','mobile_money',5);
+INSERT INTO "cotisations" VALUES(7,1,10,25000,'2025-11-12','mobile_money',6);
+INSERT INTO "cotisations" VALUES(8,1,11,25000,'2025-11-17','especes',NULL);
+INSERT INTO "cotisations" VALUES(9,1,12,25000,'2025-11-10','mobile_money',7);
+INSERT INTO "cotisations" VALUES(10,1,13,25000,'2025-11-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(11,1,14,25000,'2025-11-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(12,1,15,25000,'2025-11-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(13,1,16,25000,'2025-11-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(14,1,17,25000,'2025-11-13','mobile_money',8);
+INSERT INTO "cotisations" VALUES(15,1,18,25000,'2025-11-10','mobile_money',9);
+INSERT INTO "cotisations" VALUES(16,1,19,25000,'2025-11-11','mobile_money',10);
+INSERT INTO "cotisations" VALUES(17,1,20,25000,'2025-11-13','mobile_money',11);
+INSERT INTO "cotisations" VALUES(18,1,21,25000,'2025-11-11','mobile_money',12);
+INSERT INTO "cotisations" VALUES(19,1,22,25000,'2025-11-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(20,1,23,25000,'2025-11-21','mobile_money',13);
+INSERT INTO "cotisations" VALUES(21,1,24,25000,'2025-11-13','mobile_money',14);
+INSERT INTO "cotisations" VALUES(22,2,1,25000,'2025-12-13','mobile_money',15);
+INSERT INTO "cotisations" VALUES(23,2,2,25000,'2025-12-13','mobile_money',16);
+INSERT INTO "cotisations" VALUES(24,2,3,25000,'2025-12-10','especes',NULL);
+INSERT INTO "cotisations" VALUES(25,2,4,25000,'2025-12-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(26,2,5,25000,'2025-12-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(27,2,6,25000,'2025-12-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(28,2,7,25000,'2025-12-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(29,2,8,25000,'2025-12-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(30,2,10,25000,'2025-12-13','mobile_money',17);
+INSERT INTO "cotisations" VALUES(31,2,12,25000,'2025-12-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(32,2,13,25000,'2025-12-12','mobile_money',18);
+INSERT INTO "cotisations" VALUES(33,2,14,25000,'2025-12-13','mobile_money',19);
+INSERT INTO "cotisations" VALUES(34,2,15,25000,'2025-12-18','mobile_money',20);
+INSERT INTO "cotisations" VALUES(35,2,16,25000,'2025-12-18','mobile_money',21);
+INSERT INTO "cotisations" VALUES(36,2,17,25000,'2025-12-12','mobile_money',22);
+INSERT INTO "cotisations" VALUES(37,2,18,25000,'2025-12-15','mobile_money',23);
+INSERT INTO "cotisations" VALUES(38,2,19,25000,'2025-12-11','mobile_money',24);
+INSERT INTO "cotisations" VALUES(39,2,20,25000,'2025-12-10','especes',NULL);
+INSERT INTO "cotisations" VALUES(40,2,21,25000,'2025-12-11','mobile_money',25);
+INSERT INTO "cotisations" VALUES(41,2,22,25000,'2025-12-11','mobile_money',26);
+INSERT INTO "cotisations" VALUES(42,2,23,25000,'2025-12-17','especes',NULL);
+INSERT INTO "cotisations" VALUES(43,2,24,25000,'2025-12-13','mobile_money',27);
+INSERT INTO "cotisations" VALUES(44,2,25,25000,'2025-12-17','mobile_money',28);
+INSERT INTO "cotisations" VALUES(45,3,1,25000,'2026-01-12','mobile_money',29);
+INSERT INTO "cotisations" VALUES(46,3,2,25000,'2026-01-10','especes',NULL);
+INSERT INTO "cotisations" VALUES(47,3,3,25000,'2026-01-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(48,3,4,25000,'2026-01-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(49,3,5,25000,'2026-01-11','mobile_money',30);
+INSERT INTO "cotisations" VALUES(50,3,6,25000,'2026-01-21','especes',NULL);
+INSERT INTO "cotisations" VALUES(51,3,7,25000,'2026-01-11','mobile_money',31);
+INSERT INTO "cotisations" VALUES(52,3,8,25000,'2026-01-11','mobile_money',32);
+INSERT INTO "cotisations" VALUES(53,3,9,25000,'2026-01-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(54,3,10,25000,'2026-01-18','mobile_money',33);
+INSERT INTO "cotisations" VALUES(55,3,11,25000,'2026-01-21','especes',NULL);
+INSERT INTO "cotisations" VALUES(56,3,12,25000,'2026-01-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(57,3,13,25000,'2026-01-10','mobile_money',34);
+INSERT INTO "cotisations" VALUES(58,3,14,25000,'2026-01-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(59,3,15,25000,'2026-01-12','mobile_money',35);
+INSERT INTO "cotisations" VALUES(60,3,16,25000,'2026-01-18','especes',NULL);
+INSERT INTO "cotisations" VALUES(61,3,17,25000,'2026-01-18','mobile_money',36);
+INSERT INTO "cotisations" VALUES(62,3,18,25000,'2026-01-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(63,3,19,25000,'2026-01-15','mobile_money',37);
+INSERT INTO "cotisations" VALUES(64,3,20,25000,'2026-01-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(65,3,21,25000,'2026-01-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(66,3,22,25000,'2026-01-18','mobile_money',38);
+INSERT INTO "cotisations" VALUES(67,3,23,25000,'2026-01-13','mobile_money',39);
+INSERT INTO "cotisations" VALUES(68,3,24,25000,'2026-01-10','especes',NULL);
+INSERT INTO "cotisations" VALUES(69,4,1,25000,'2026-02-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(70,4,2,25000,'2026-02-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(71,4,3,25000,'2026-02-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(72,4,4,25000,'2026-02-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(73,4,5,25000,'2026-02-12','mobile_money',40);
+INSERT INTO "cotisations" VALUES(74,4,6,25000,'2026-02-17','mobile_money',41);
+INSERT INTO "cotisations" VALUES(75,4,7,25000,'2026-02-13','mobile_money',42);
+INSERT INTO "cotisations" VALUES(76,4,8,25000,'2026-02-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(77,4,9,25000,'2026-02-21','mobile_money',43);
+INSERT INTO "cotisations" VALUES(78,4,10,25000,'2026-02-13','mobile_money',44);
+INSERT INTO "cotisations" VALUES(79,4,11,25000,'2026-02-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(80,4,12,25000,'2026-02-15','mobile_money',45);
+INSERT INTO "cotisations" VALUES(81,4,13,25000,'2026-02-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(82,4,14,25000,'2026-02-15','mobile_money',46);
+INSERT INTO "cotisations" VALUES(83,4,15,25000,'2026-02-12','mobile_money',47);
+INSERT INTO "cotisations" VALUES(84,4,16,25000,'2026-02-18','mobile_money',48);
+INSERT INTO "cotisations" VALUES(85,4,17,25000,'2026-02-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(86,4,18,25000,'2026-02-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(87,4,19,25000,'2026-02-15','mobile_money',49);
+INSERT INTO "cotisations" VALUES(88,4,20,25000,'2026-02-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(89,4,21,25000,'2026-02-18','mobile_money',50);
+INSERT INTO "cotisations" VALUES(90,4,22,25000,'2026-02-10','mobile_money',51);
+INSERT INTO "cotisations" VALUES(91,4,23,25000,'2026-02-21','mobile_money',52);
+INSERT INTO "cotisations" VALUES(92,4,24,25000,'2026-02-15','mobile_money',53);
+INSERT INTO "cotisations" VALUES(93,4,25,25000,'2026-02-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(94,5,1,25000,'2026-03-10','mobile_money',54);
+INSERT INTO "cotisations" VALUES(95,5,2,25000,'2026-03-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(96,5,3,25000,'2026-03-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(97,5,4,25000,'2026-03-12','mobile_money',55);
+INSERT INTO "cotisations" VALUES(98,5,5,25000,'2026-03-12','mobile_money',56);
+INSERT INTO "cotisations" VALUES(99,5,6,25000,'2026-03-17','mobile_money',57);
+INSERT INTO "cotisations" VALUES(100,5,7,25000,'2026-03-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(101,5,8,25000,'2026-03-11','mobile_money',58);
+INSERT INTO "cotisations" VALUES(102,5,9,25000,'2026-03-17','mobile_money',59);
+INSERT INTO "cotisations" VALUES(103,5,10,25000,'2026-03-15','mobile_money',60);
+INSERT INTO "cotisations" VALUES(104,5,12,25000,'2026-03-12','mobile_money',61);
+INSERT INTO "cotisations" VALUES(105,5,13,25000,'2026-03-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(106,5,14,25000,'2026-03-13','mobile_money',62);
+INSERT INTO "cotisations" VALUES(107,5,15,25000,'2026-03-10','mobile_money',63);
+INSERT INTO "cotisations" VALUES(108,5,16,25000,'2026-03-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(109,5,17,25000,'2026-03-13','mobile_money',64);
+INSERT INTO "cotisations" VALUES(110,5,18,25000,'2026-03-18','especes',NULL);
+INSERT INTO "cotisations" VALUES(111,5,19,25000,'2026-03-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(112,5,20,25000,'2026-03-18','mobile_money',65);
+INSERT INTO "cotisations" VALUES(113,5,21,25000,'2026-03-11','mobile_money',66);
+INSERT INTO "cotisations" VALUES(114,5,22,25000,'2026-03-13','mobile_money',67);
+INSERT INTO "cotisations" VALUES(115,5,23,25000,'2026-03-21','mobile_money',68);
+INSERT INTO "cotisations" VALUES(116,5,24,25000,'2026-03-10','mobile_money',69);
+INSERT INTO "cotisations" VALUES(117,6,1,25000,'2026-04-12','mobile_money',70);
+INSERT INTO "cotisations" VALUES(118,6,2,25000,'2026-04-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(119,6,3,25000,'2026-04-11','mobile_money',71);
+INSERT INTO "cotisations" VALUES(120,6,4,25000,'2026-04-12','mobile_money',72);
+INSERT INTO "cotisations" VALUES(121,6,5,25000,'2026-04-18','mobile_money',73);
+INSERT INTO "cotisations" VALUES(122,6,6,25000,'2026-04-21','especes',NULL);
+INSERT INTO "cotisations" VALUES(123,6,7,25000,'2026-04-13','mobile_money',74);
+INSERT INTO "cotisations" VALUES(124,6,8,25000,'2026-04-12','mobile_money',75);
+INSERT INTO "cotisations" VALUES(125,6,9,25000,'2026-04-21','mobile_money',76);
+INSERT INTO "cotisations" VALUES(126,6,10,25000,'2026-04-10','mobile_money',77);
+INSERT INTO "cotisations" VALUES(127,6,11,25000,'2026-04-17','mobile_money',78);
+INSERT INTO "cotisations" VALUES(128,6,12,25000,'2026-04-12','mobile_money',79);
+INSERT INTO "cotisations" VALUES(129,6,13,25000,'2026-04-13','mobile_money',80);
+INSERT INTO "cotisations" VALUES(130,6,14,25000,'2026-04-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(131,6,15,25000,'2026-04-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(132,6,16,25000,'2026-04-11','mobile_money',81);
+INSERT INTO "cotisations" VALUES(133,6,17,25000,'2026-04-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(134,6,18,25000,'2026-04-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(135,6,19,25000,'2026-04-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(136,6,20,25000,'2026-04-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(137,6,21,25000,'2026-04-18','mobile_money',82);
+INSERT INTO "cotisations" VALUES(138,6,22,25000,'2026-04-13','mobile_money',83);
+INSERT INTO "cotisations" VALUES(139,6,24,25000,'2026-04-13','mobile_money',84);
+INSERT INTO "cotisations" VALUES(140,6,25,25000,'2026-04-13','mobile_money',85);
+INSERT INTO "cotisations" VALUES(141,7,1,25000,'2026-05-11','mobile_money',86);
+INSERT INTO "cotisations" VALUES(142,7,2,25000,'2026-05-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(143,7,3,25000,'2026-05-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(144,7,4,25000,'2026-05-18','mobile_money',87);
+INSERT INTO "cotisations" VALUES(145,7,5,25000,'2026-05-15','mobile_money',88);
+INSERT INTO "cotisations" VALUES(146,7,6,25000,'2026-05-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(147,7,7,25000,'2026-05-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(148,7,8,25000,'2026-05-13','mobile_money',89);
+INSERT INTO "cotisations" VALUES(149,7,9,25000,'2026-05-13','mobile_money',90);
+INSERT INTO "cotisations" VALUES(150,7,10,25000,'2026-05-18','mobile_money',91);
+INSERT INTO "cotisations" VALUES(151,7,11,25000,'2026-05-17','especes',NULL);
+INSERT INTO "cotisations" VALUES(152,7,12,25000,'2026-05-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(153,7,13,25000,'2026-05-12','mobile_money',92);
+INSERT INTO "cotisations" VALUES(154,7,14,25000,'2026-05-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(155,7,15,25000,'2026-05-13','mobile_money',93);
+INSERT INTO "cotisations" VALUES(156,7,16,25000,'2026-05-11','mobile_money',94);
+INSERT INTO "cotisations" VALUES(157,7,17,25000,'2026-05-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(158,7,18,25000,'2026-05-18','mobile_money',95);
+INSERT INTO "cotisations" VALUES(159,7,19,25000,'2026-05-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(160,7,20,25000,'2026-05-13','mobile_money',96);
+INSERT INTO "cotisations" VALUES(161,7,21,25000,'2026-05-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(162,7,22,25000,'2026-05-11','mobile_money',97);
+INSERT INTO "cotisations" VALUES(163,7,24,25000,'2026-05-18','especes',NULL);
+INSERT INTO "cotisations" VALUES(164,7,25,25000,'2026-05-25','mobile_money',98);
+INSERT INTO "cotisations" VALUES(165,8,1,25000,'2026-06-13','mobile_money',99);
+INSERT INTO "cotisations" VALUES(166,8,2,25000,'2026-06-10','especes',NULL);
+INSERT INTO "cotisations" VALUES(167,8,3,25000,'2026-06-10','mobile_money',100);
+INSERT INTO "cotisations" VALUES(168,8,4,25000,'2026-06-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(169,8,5,25000,'2026-06-18','mobile_money',101);
+INSERT INTO "cotisations" VALUES(170,8,6,25000,'2026-06-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(171,8,7,25000,'2026-06-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(172,8,8,25000,'2026-06-15','mobile_money',102);
+INSERT INTO "cotisations" VALUES(173,8,9,25000,'2026-06-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(174,8,10,25000,'2026-06-13','mobile_money',103);
+INSERT INTO "cotisations" VALUES(175,8,11,25000,'2026-06-17','mobile_money',104);
+INSERT INTO "cotisations" VALUES(176,8,12,25000,'2026-06-13','mobile_money',105);
+INSERT INTO "cotisations" VALUES(177,8,13,25000,'2026-06-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(178,8,14,25000,'2026-06-13','mobile_money',106);
+INSERT INTO "cotisations" VALUES(179,8,15,25000,'2026-06-13','mobile_money',107);
+INSERT INTO "cotisations" VALUES(180,8,16,25000,'2026-06-13','mobile_money',108);
+INSERT INTO "cotisations" VALUES(181,8,17,25000,'2026-06-11','mobile_money',109);
+INSERT INTO "cotisations" VALUES(182,8,18,25000,'2026-06-18','mobile_money',110);
+INSERT INTO "cotisations" VALUES(183,8,19,25000,'2026-06-15','mobile_money',111);
+INSERT INTO "cotisations" VALUES(184,8,20,25000,'2026-06-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(185,8,21,25000,'2026-06-15','mobile_money',112);
+INSERT INTO "cotisations" VALUES(186,8,22,25000,'2026-06-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(187,8,23,25000,'2026-06-17','especes',NULL);
+INSERT INTO "cotisations" VALUES(188,8,24,25000,'2026-06-18','especes',NULL);
+INSERT INTO "cotisations" VALUES(189,8,25,25000,'2026-06-21','mobile_money',113);
+INSERT INTO "cotisations" VALUES(190,9,1,25000,'2026-07-15','mobile_money',114);
+INSERT INTO "cotisations" VALUES(191,9,2,25000,'2026-07-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(192,9,3,25000,'2026-07-15','mobile_money',115);
+INSERT INTO "cotisations" VALUES(193,9,4,25000,'2026-07-13','mobile_money',116);
+INSERT INTO "cotisations" VALUES(194,9,5,25000,'2026-07-15','mobile_money',117);
+INSERT INTO "cotisations" VALUES(195,9,6,25000,'2026-07-15','mobile_money',118);
+INSERT INTO "cotisations" VALUES(196,9,7,25000,'2026-07-10','especes',NULL);
+INSERT INTO "cotisations" VALUES(197,9,8,25000,'2026-07-18','mobile_money',119);
+INSERT INTO "cotisations" VALUES(198,9,10,25000,'2026-07-13','mobile_money',120);
+INSERT INTO "cotisations" VALUES(199,9,11,25000,'2026-07-15','mobile_money',121);
+INSERT INTO "cotisations" VALUES(200,9,12,25000,'2026-07-11','mobile_money',122);
+INSERT INTO "cotisations" VALUES(201,9,13,25000,'2026-07-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(202,9,14,25000,'2026-07-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(203,9,15,25000,'2026-07-18','especes',NULL);
+INSERT INTO "cotisations" VALUES(204,9,16,25000,'2026-07-13','mobile_money',123);
+INSERT INTO "cotisations" VALUES(205,9,17,25000,'2026-07-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(206,9,18,25000,'2026-07-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(207,9,19,25000,'2026-07-13','mobile_money',124);
+INSERT INTO "cotisations" VALUES(208,9,20,25000,'2026-07-13','mobile_money',125);
+INSERT INTO "cotisations" VALUES(209,9,21,25000,'2026-07-11','mobile_money',126);
+INSERT INTO "cotisations" VALUES(210,9,22,25000,'2026-07-12','mobile_money',127);
+INSERT INTO "cotisations" VALUES(211,9,23,25000,'2026-07-15','mobile_money',128);
+INSERT INTO "cotisations" VALUES(212,9,24,25000,'2026-07-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(213,9,25,25000,'2026-07-25','mobile_money',129);
+INSERT INTO "cotisations" VALUES(214,10,1,25000,'2026-08-11','mobile_money',130);
+INSERT INTO "cotisations" VALUES(215,10,2,25000,'2026-08-18','especes',NULL);
+INSERT INTO "cotisations" VALUES(216,10,3,25000,'2026-08-13','mobile_money',131);
+INSERT INTO "cotisations" VALUES(217,10,4,25000,'2026-08-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(218,10,5,25000,'2026-08-11','mobile_money',132);
+INSERT INTO "cotisations" VALUES(219,10,6,25000,'2026-08-21','especes',NULL);
+INSERT INTO "cotisations" VALUES(220,10,7,25000,'2026-08-15','mobile_money',133);
+INSERT INTO "cotisations" VALUES(221,10,8,25000,'2026-08-11','mobile_money',134);
+INSERT INTO "cotisations" VALUES(222,10,10,25000,'2026-08-13','mobile_money',135);
+INSERT INTO "cotisations" VALUES(223,10,11,25000,'2026-08-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(224,10,12,25000,'2026-08-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(225,10,13,25000,'2026-08-10','mobile_money',136);
+INSERT INTO "cotisations" VALUES(226,10,14,25000,'2026-08-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(227,10,15,25000,'2026-08-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(228,10,16,25000,'2026-08-13','mobile_money',137);
+INSERT INTO "cotisations" VALUES(229,10,17,25000,'2026-08-10','especes',NULL);
+INSERT INTO "cotisations" VALUES(230,10,18,25000,'2026-08-11','mobile_money',138);
+INSERT INTO "cotisations" VALUES(231,10,19,25000,'2026-08-12','mobile_money',139);
+INSERT INTO "cotisations" VALUES(232,10,20,25000,'2026-08-10','mobile_money',140);
+INSERT INTO "cotisations" VALUES(233,10,21,25000,'2026-08-13','mobile_money',141);
+INSERT INTO "cotisations" VALUES(234,10,22,25000,'2026-08-18','especes',NULL);
+INSERT INTO "cotisations" VALUES(235,10,23,25000,'2026-08-17','especes',NULL);
+INSERT INTO "cotisations" VALUES(236,10,24,25000,'2026-08-13','mobile_money',142);
+INSERT INTO "cotisations" VALUES(237,11,1,25000,'2026-09-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(238,11,2,25000,'2026-09-10','mobile_money',143);
+INSERT INTO "cotisations" VALUES(239,11,3,25000,'2026-09-11','mobile_money',144);
+INSERT INTO "cotisations" VALUES(240,11,4,25000,'2026-09-11','mobile_money',145);
+INSERT INTO "cotisations" VALUES(241,11,5,25000,'2026-09-10','mobile_money',146);
+INSERT INTO "cotisations" VALUES(242,11,6,25000,'2026-09-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(243,11,7,25000,'2026-09-10','especes',NULL);
+INSERT INTO "cotisations" VALUES(244,11,8,25000,'2026-09-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(245,11,9,25000,'2026-09-17','especes',NULL);
+INSERT INTO "cotisations" VALUES(246,11,10,25000,'2026-09-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(247,11,11,25000,'2026-09-21','mobile_money',147);
+INSERT INTO "cotisations" VALUES(248,11,12,25000,'2026-09-13','mobile_money',148);
+INSERT INTO "cotisations" VALUES(249,11,13,25000,'2026-09-15','mobile_money',149);
+INSERT INTO "cotisations" VALUES(250,11,14,25000,'2026-09-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(251,11,15,25000,'2026-09-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(252,11,16,25000,'2026-09-10','mobile_money',150);
+INSERT INTO "cotisations" VALUES(253,11,17,25000,'2026-09-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(254,11,18,25000,'2026-09-10','mobile_money',151);
+INSERT INTO "cotisations" VALUES(255,11,19,25000,'2026-09-10','mobile_money',152);
+INSERT INTO "cotisations" VALUES(256,11,20,25000,'2026-09-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(257,11,21,25000,'2026-09-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(258,11,22,25000,'2026-09-13','mobile_money',153);
+INSERT INTO "cotisations" VALUES(259,11,23,25000,'2026-09-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(260,11,24,25000,'2026-09-12','mobile_money',154);
+INSERT INTO "cotisations" VALUES(261,12,1,25000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(262,12,2,25000,'2026-10-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(263,12,3,25000,'2026-10-13','mobile_money',155);
+INSERT INTO "cotisations" VALUES(264,12,4,25000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(265,12,5,25000,'2026-10-13','mobile_money',156);
+INSERT INTO "cotisations" VALUES(266,12,7,25000,'2026-10-13','mobile_money',157);
+INSERT INTO "cotisations" VALUES(267,12,8,25000,'2026-10-15','mobile_money',158);
+INSERT INTO "cotisations" VALUES(268,12,10,25000,'2026-10-10','mobile_money',159);
+INSERT INTO "cotisations" VALUES(269,12,11,25000,'2026-10-23','mobile_money',160);
+INSERT INTO "cotisations" VALUES(270,12,12,25000,'2026-10-11','mobile_money',161);
+INSERT INTO "cotisations" VALUES(271,12,13,25000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(272,12,14,25000,'2026-10-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(273,12,15,25000,'2026-10-18','mobile_money',162);
+INSERT INTO "cotisations" VALUES(274,12,16,25000,'2026-10-13','mobile_money',163);
+INSERT INTO "cotisations" VALUES(275,12,17,25000,'2026-10-10','mobile_money',164);
+INSERT INTO "cotisations" VALUES(276,12,18,25000,'2026-10-11','mobile_money',165);
+INSERT INTO "cotisations" VALUES(277,12,19,25000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(278,12,20,25000,'2026-10-12','mobile_money',166);
+INSERT INTO "cotisations" VALUES(279,12,21,25000,'2026-10-15','mobile_money',167);
+INSERT INTO "cotisations" VALUES(280,12,22,25000,'2026-10-15','especes',NULL);
+INSERT INTO "cotisations" VALUES(281,12,23,25000,'2026-10-17','especes',NULL);
+INSERT INTO "cotisations" VALUES(282,12,24,25000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(283,12,25,25000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(284,26,26,10000,'2026-09-24','mobile_money',198);
+INSERT INTO "cotisations" VALUES(285,26,27,10000,'2026-09-22','mobile_money',199);
+INSERT INTO "cotisations" VALUES(286,26,28,10000,'2026-09-24','especes',NULL);
+INSERT INTO "cotisations" VALUES(287,26,29,10000,'2026-09-27','mobile_money',200);
+INSERT INTO "cotisations" VALUES(288,26,31,10000,'2026-09-22','mobile_money',201);
+INSERT INTO "cotisations" VALUES(289,26,32,10000,'2026-09-22','mobile_money',202);
+INSERT INTO "cotisations" VALUES(290,26,33,10000,'2026-09-27','mobile_money',203);
+INSERT INTO "cotisations" VALUES(291,26,34,10000,'2026-09-22','mobile_money',204);
+INSERT INTO "cotisations" VALUES(292,26,35,10000,'2026-09-22','mobile_money',205);
+INSERT INTO "cotisations" VALUES(293,26,36,10000,'2026-09-24','mobile_money',206);
+INSERT INTO "cotisations" VALUES(294,27,26,10000,'2026-09-29','mobile_money',207);
+INSERT INTO "cotisations" VALUES(295,27,27,10000,'2026-09-29','especes',NULL);
+INSERT INTO "cotisations" VALUES(296,27,28,10000,'2026-09-28','mobile_money',208);
+INSERT INTO "cotisations" VALUES(297,27,29,10000,'2026-09-28','mobile_money',209);
+INSERT INTO "cotisations" VALUES(298,27,31,10000,'2026-09-29','mobile_money',210);
+INSERT INTO "cotisations" VALUES(299,27,32,10000,'2026-09-29','mobile_money',211);
+INSERT INTO "cotisations" VALUES(300,27,33,10000,'2026-09-27','mobile_money',212);
+INSERT INTO "cotisations" VALUES(301,27,34,10000,'2026-09-26','mobile_money',213);
+INSERT INTO "cotisations" VALUES(302,27,35,10000,'2026-09-29','mobile_money',214);
+INSERT INTO "cotisations" VALUES(303,27,36,10000,'2026-09-26','especes',NULL);
+INSERT INTO "cotisations" VALUES(304,27,37,10000,'2026-10-07','mobile_money',215);
+INSERT INTO "cotisations" VALUES(305,28,26,10000,'2026-10-06','mobile_money',216);
+INSERT INTO "cotisations" VALUES(306,28,27,10000,'2026-10-06','mobile_money',217);
+INSERT INTO "cotisations" VALUES(307,28,28,10000,'2026-10-06','mobile_money',218);
+INSERT INTO "cotisations" VALUES(308,28,29,10000,'2026-10-06','mobile_money',219);
+INSERT INTO "cotisations" VALUES(309,28,30,10000,'2026-10-06','especes',NULL);
+INSERT INTO "cotisations" VALUES(310,28,31,10000,'2026-10-06','mobile_money',220);
+INSERT INTO "cotisations" VALUES(311,28,32,10000,'2026-10-04','mobile_money',221);
+INSERT INTO "cotisations" VALUES(312,28,33,10000,'2026-10-06','mobile_money',222);
+INSERT INTO "cotisations" VALUES(313,28,34,10000,'2026-10-04','especes',NULL);
+INSERT INTO "cotisations" VALUES(314,28,35,10000,'2026-10-08','especes',NULL);
+INSERT INTO "cotisations" VALUES(315,28,36,10000,'2026-10-06','mobile_money',223);
+INSERT INTO "cotisations" VALUES(316,29,26,10000,'2026-10-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(317,29,27,10000,'2026-10-12','mobile_money',224);
+INSERT INTO "cotisations" VALUES(318,29,28,10000,'2026-10-13','mobile_money',225);
+INSERT INTO "cotisations" VALUES(319,29,29,10000,'2026-10-12','especes',NULL);
+INSERT INTO "cotisations" VALUES(320,29,30,10000,'2026-10-15','mobile_money',226);
+INSERT INTO "cotisations" VALUES(321,29,31,10000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(322,29,32,10000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(323,29,33,10000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(324,29,34,10000,'2026-10-11','especes',NULL);
+INSERT INTO "cotisations" VALUES(325,29,35,10000,'2026-10-11','mobile_money',227);
+INSERT INTO "cotisations" VALUES(326,29,36,10000,'2026-10-13','especes',NULL);
+INSERT INTO "cotisations" VALUES(327,30,26,10000,'2026-10-17','mobile_money',228);
+INSERT INTO "cotisations" VALUES(328,30,27,10000,'2026-10-20','mobile_money',229);
+INSERT INTO "cotisations" VALUES(329,30,28,10000,'2026-10-20','mobile_money',230);
+INSERT INTO "cotisations" VALUES(330,30,29,10000,'2026-10-18','especes',NULL);
+INSERT INTO "cotisations" VALUES(331,30,30,10000,'2026-10-23','mobile_money',231);
+INSERT INTO "cotisations" VALUES(332,30,31,10000,'2026-10-23','mobile_money',232);
+INSERT INTO "cotisations" VALUES(333,30,32,10000,'2026-10-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(334,30,33,10000,'2026-10-20','mobile_money',233);
+INSERT INTO "cotisations" VALUES(335,30,34,10000,'2026-10-20','especes',NULL);
+INSERT INTO "cotisations" VALUES(336,30,35,10000,'2026-10-20','mobile_money',234);
+INSERT INTO "cotisations" VALUES(337,30,36,10000,'2026-10-23','mobile_money',235);
+INSERT INTO "cotisations" VALUES(338,30,37,10000,'2026-10-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(339,38,49,15000,'2026-01-23','mobile_money',241);
+INSERT INTO "cotisations" VALUES(340,38,50,15000,'2026-01-23','mobile_money',242);
+INSERT INTO "cotisations" VALUES(341,38,51,15000,'2026-01-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(342,38,52,15000,'2026-01-23','mobile_money',243);
+INSERT INTO "cotisations" VALUES(343,38,53,15000,'2026-01-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(344,38,54,15000,'2026-01-23','mobile_money',244);
+INSERT INTO "cotisations" VALUES(345,38,55,15000,'2026-01-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(346,38,56,15000,'2026-01-25','mobile_money',245);
+INSERT INTO "cotisations" VALUES(347,39,49,15000,'2026-02-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(348,39,50,15000,'2026-02-28','especes',NULL);
+INSERT INTO "cotisations" VALUES(349,39,51,15000,'2026-02-23','mobile_money',246);
+INSERT INTO "cotisations" VALUES(350,39,52,15000,'2026-02-22','especes',NULL);
+INSERT INTO "cotisations" VALUES(351,39,53,15000,'2026-02-25','mobile_money',247);
+INSERT INTO "cotisations" VALUES(352,39,54,15000,'2026-02-23','mobile_money',248);
+INSERT INTO "cotisations" VALUES(353,39,55,15000,'2026-02-23','mobile_money',249);
+INSERT INTO "cotisations" VALUES(354,39,56,15000,'2026-02-20','mobile_money',250);
+INSERT INTO "cotisations" VALUES(355,40,49,15000,'2026-03-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(356,40,50,15000,'2026-03-25','mobile_money',251);
+INSERT INTO "cotisations" VALUES(357,40,51,15000,'2026-03-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(358,40,52,15000,'2026-03-28','mobile_money',252);
+INSERT INTO "cotisations" VALUES(359,40,53,15000,'2026-03-28','mobile_money',253);
+INSERT INTO "cotisations" VALUES(360,40,54,15000,'2026-03-20','especes',NULL);
+INSERT INTO "cotisations" VALUES(361,40,55,15000,'2026-03-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(362,40,56,15000,'2026-03-22','mobile_money',254);
+INSERT INTO "cotisations" VALUES(363,41,49,15000,'2026-04-23','mobile_money',255);
+INSERT INTO "cotisations" VALUES(364,41,50,15000,'2026-04-20','especes',NULL);
+INSERT INTO "cotisations" VALUES(365,41,51,15000,'2026-04-23','mobile_money',256);
+INSERT INTO "cotisations" VALUES(366,41,52,15000,'2026-04-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(367,41,53,15000,'2026-04-28','especes',NULL);
+INSERT INTO "cotisations" VALUES(368,41,54,15000,'2026-04-23','mobile_money',257);
+INSERT INTO "cotisations" VALUES(369,41,55,15000,'2026-04-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(370,41,56,15000,'2026-04-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(371,42,49,15000,'2026-05-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(372,42,50,15000,'2026-05-28','mobile_money',258);
+INSERT INTO "cotisations" VALUES(373,42,51,15000,'2026-05-21','mobile_money',259);
+INSERT INTO "cotisations" VALUES(374,42,52,15000,'2026-05-22','especes',NULL);
+INSERT INTO "cotisations" VALUES(375,42,53,15000,'2026-05-20','mobile_money',260);
+INSERT INTO "cotisations" VALUES(376,42,54,15000,'2026-05-23','mobile_money',261);
+INSERT INTO "cotisations" VALUES(377,42,55,15000,'2026-05-25','mobile_money',262);
+INSERT INTO "cotisations" VALUES(378,42,56,15000,'2026-05-22','mobile_money',263);
+INSERT INTO "cotisations" VALUES(379,43,49,15000,'2026-06-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(380,43,50,15000,'2026-06-20','mobile_money',264);
+INSERT INTO "cotisations" VALUES(381,43,51,15000,'2026-06-22','especes',NULL);
+INSERT INTO "cotisations" VALUES(382,43,52,15000,'2026-06-25','mobile_money',265);
+INSERT INTO "cotisations" VALUES(383,43,53,15000,'2026-06-25','mobile_money',266);
+INSERT INTO "cotisations" VALUES(384,43,54,15000,'2026-06-21','mobile_money',267);
+INSERT INTO "cotisations" VALUES(385,43,55,15000,'2026-06-21','especes',NULL);
+INSERT INTO "cotisations" VALUES(386,43,56,15000,'2026-06-21','especes',NULL);
+INSERT INTO "cotisations" VALUES(387,44,49,15000,'2026-07-28','especes',NULL);
+INSERT INTO "cotisations" VALUES(388,44,50,15000,'2026-07-28','especes',NULL);
+INSERT INTO "cotisations" VALUES(389,44,51,15000,'2026-07-23','mobile_money',268);
+INSERT INTO "cotisations" VALUES(390,44,52,15000,'2026-07-25','especes',NULL);
+INSERT INTO "cotisations" VALUES(391,44,53,15000,'2026-07-22','especes',NULL);
+INSERT INTO "cotisations" VALUES(392,44,54,15000,'2026-07-20','mobile_money',269);
+INSERT INTO "cotisations" VALUES(393,44,55,15000,'2026-07-21','mobile_money',270);
+INSERT INTO "cotisations" VALUES(394,44,56,15000,'2026-07-20','mobile_money',271);
+INSERT INTO "cotisations" VALUES(395,45,49,15000,'2026-08-28','mobile_money',272);
+INSERT INTO "cotisations" VALUES(396,45,50,15000,'2026-08-21','mobile_money',273);
+INSERT INTO "cotisations" VALUES(397,45,51,15000,'2026-08-22','mobile_money',274);
+INSERT INTO "cotisations" VALUES(398,45,52,15000,'2026-08-22','especes',NULL);
+INSERT INTO "cotisations" VALUES(399,45,53,15000,'2026-08-22','especes',NULL);
+INSERT INTO "cotisations" VALUES(400,45,54,15000,'2026-08-20','mobile_money',275);
+INSERT INTO "cotisations" VALUES(401,45,55,15000,'2026-08-23','especes',NULL);
+INSERT INTO "cotisations" VALUES(402,45,56,15000,'2026-08-23','especes',NULL);
+CREATE TABLE cycles (
+    id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+    tontine_id              INTEGER NOT NULL REFERENCES tontines (id),
+    nom                     TEXT    NOT NULL,
+    montant_cotisation      INTEGER NOT NULL CHECK (montant_cotisation > 0),
+    periodicite             TEXT    NOT NULL CHECK (periodicite IN ('hebdomadaire', 'mensuelle')),
+    date_debut              TEXT    NOT NULL,
+    montant_penalite_retard  INTEGER NOT NULL DEFAULT 1000 CHECK (montant_penalite_retard >= 0),
+    montant_penalite_absence INTEGER NOT NULL DEFAULT 2000 CHECK (montant_penalite_absence >= 0),
+    statut                  TEXT    NOT NULL DEFAULT 'en_preparation'
+                            CHECK (statut IN ('en_preparation', 'en_cours', 'termine'))
+);
+INSERT INTO "cycles" VALUES(1,1,'Cycle 2025-2026',25000,'mensuelle','2025-11-13',1000,2000,'en_cours');
+INSERT INTO "cycles" VALUES(2,2,'Cycle Bonabéri',10000,'hebdomadaire','2026-09-22',500,1000,'en_cours');
+INSERT INTO "cycles" VALUES(3,4,'Cycle des anciens',15000,'mensuelle','2026-01-23',1000,2000,'termine');
+CREATE TABLE evenements (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    tontine_id      INTEGER NOT NULL REFERENCES tontines (id),
+    titre           TEXT    NOT NULL CHECK (length(titre) BETWEEN 2 AND 80),
+    type            TEXT    NOT NULL CHECK (type IN ('mariage', 'deuil', 'naissance', 'anniversaire', 'fete', 'autre')),
+    description     TEXT    NOT NULL DEFAULT '' CHECK (length(description) <= 500),
+    date_evenement  TEXT    NOT NULL,
+    date_limite     TEXT,  -- dernier jour pour contribuer (facultatif)
+    concerne_id     INTEGER REFERENCES adhesions (id),  -- membre concerné (facultatif)
+    objectif        INTEGER CHECK (objectif IS NULL OR objectif > 0),
+    montant_suggere INTEGER CHECK (montant_suggere IS NULL OR montant_suggere > 0),
+    statut          TEXT    NOT NULL DEFAULT 'ouvert' CHECK (statut IN ('ouvert', 'clos')),
+    cree_par        INTEGER NOT NULL REFERENCES adhesions (id),
+    date_creation   TEXT    NOT NULL
+);
+INSERT INTO "evenements" VALUES(1,1,'Mariage de Aline Etoundi','mariage','Les membres qui le souhaitent contribuent pour le mariage.','2026-11-22','2026-11-17',8,300000,5000,'ouvert',1,'2026-10-03');
+INSERT INTO "evenements" VALUES(2,1,'Deuil dans la famille de Rose Tchoupo','deuil','Soutien à la famille pour les obsèques.','2026-10-17',NULL,12,NULL,2000,'ouvert',2,'2026-10-12');
+INSERT INTO "evenements" VALUES(3,1,'Naissance chez Valentin Etoundi','naissance','Un petit cadeau pour la nouvelle famille.','2026-08-24','2026-09-03',16,100000,2000,'clos',1,'2026-10-07');
+INSERT INTO "evenements" VALUES(4,2,'Anniversaire de Aline Etoundi','anniversaire','Une fête pour les 50 ans.','2026-11-04','2026-11-02',30,60000,2000,'ouvert',26,'2026-10-14');
+INSERT INTO "evenements" VALUES(5,4,'Retrouvailles des anciens','fete','Repas de retrouvailles de fin de cycle.','2026-09-23','2026-09-18',NULL,150000,5000,'clos',49,'2026-09-29');
+CREATE TABLE journal_actions (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    tontine_id     INTEGER REFERENCES tontines (id),
+    utilisateur_id INTEGER NOT NULL REFERENCES utilisateurs (id),
+    action         TEXT    NOT NULL,
+    detail         TEXT    NOT NULL,
+    date_action    TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+INSERT INTO "journal_actions" VALUES(1,1,1,'Tontine créée','Tontine des commerçants de Mboppi','2025-11-27 09:46:00');
+INSERT INTO "journal_actions" VALUES(2,1,1,'Cycle créé','Cycle 2025-2026 : 25 séances de 25000 FCFA','2025-12-02 11:34:00');
+INSERT INTO "journal_actions" VALUES(3,1,1,'Tirage au sort','Cycle « Cycle 2025-2026 » : 25 bénéficiaire(s) tiré(s)','2025-12-03 14:12:00');
+INSERT INTO "journal_actions" VALUES(4,1,2,'Cotisations','Séance n° 12 : 20 cotisation(s) enregistrée(s)','2026-10-14 11:33:00');
+INSERT INTO "journal_actions" VALUES(5,2,4,'Tontine créée','Njangi des femmes de Bonabéri','2026-09-07 18:15:00');
+INSERT INTO "journal_actions" VALUES(6,2,5,'Cotisations','Séance n° 5 : 11 cotisation(s) enregistrée(s)','2026-10-20 17:40:00');
+INSERT INTO "journal_actions" VALUES(7,3,32,'Tontine créée','Jeunes entrepreneurs de Yaoundé','2026-10-11 10:35:00');
+INSERT INTO "journal_actions" VALUES(8,4,38,'Clôture','La tontine est terminée','2026-09-13 16:26:00');
+CREATE TABLE lignes_paiement (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    paiement_id INTEGER NOT NULL REFERENCES paiements (id),
+    type        TEXT    NOT NULL CHECK (type IN ('cotisation', 'penalite', 'evenement')),
+    seance_id   INTEGER REFERENCES seances (id),
+    penalite_id INTEGER REFERENCES penalites (id),
+    evenement_id INTEGER REFERENCES evenements (id),
+    montant     INTEGER NOT NULL CHECK (montant > 0),
+    CHECK ((type = 'cotisation' AND seance_id IS NOT NULL AND penalite_id IS NULL AND evenement_id IS NULL)
+        OR (type = 'penalite' AND penalite_id IS NOT NULL AND seance_id IS NULL AND evenement_id IS NULL)
+        OR (type = 'evenement' AND evenement_id IS NOT NULL AND seance_id IS NULL AND penalite_id IS NULL))
+);
+INSERT INTO "lignes_paiement" VALUES(1,1,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(2,2,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(3,3,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(4,4,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(5,5,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(6,6,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(7,7,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(8,8,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(9,9,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(10,10,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(11,11,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(12,12,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(13,13,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(14,14,'cotisation',1,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(15,15,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(16,16,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(17,17,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(18,18,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(19,19,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(20,20,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(21,21,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(22,22,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(23,23,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(24,24,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(25,25,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(26,26,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(27,27,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(28,28,'cotisation',2,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(29,29,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(30,30,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(31,31,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(32,32,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(33,33,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(34,34,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(35,35,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(36,36,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(37,37,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(38,38,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(39,39,'cotisation',3,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(40,40,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(41,41,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(42,42,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(43,43,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(44,44,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(45,45,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(46,46,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(47,47,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(48,48,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(49,49,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(50,50,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(51,51,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(52,52,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(53,53,'cotisation',4,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(54,54,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(55,55,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(56,56,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(57,57,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(58,58,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(59,59,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(60,60,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(61,61,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(62,62,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(63,63,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(64,64,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(65,65,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(66,66,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(67,67,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(68,68,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(69,69,'cotisation',5,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(70,70,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(71,71,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(72,72,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(73,73,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(74,74,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(75,75,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(76,76,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(77,77,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(78,78,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(79,79,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(80,80,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(81,81,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(82,82,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(83,83,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(84,84,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(85,85,'cotisation',6,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(86,86,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(87,87,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(88,88,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(89,89,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(90,90,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(91,91,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(92,92,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(93,93,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(94,94,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(95,95,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(96,96,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(97,97,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(98,98,'cotisation',7,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(99,99,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(100,100,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(101,101,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(102,102,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(103,103,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(104,104,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(105,105,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(106,106,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(107,107,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(108,108,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(109,109,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(110,110,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(111,111,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(112,112,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(113,113,'cotisation',8,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(114,114,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(115,115,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(116,116,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(117,117,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(118,118,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(119,119,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(120,120,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(121,121,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(122,122,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(123,123,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(124,124,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(125,125,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(126,126,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(127,127,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(128,128,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(129,129,'cotisation',9,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(130,130,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(131,131,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(132,132,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(133,133,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(134,134,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(135,135,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(136,136,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(137,137,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(138,138,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(139,139,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(140,140,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(141,141,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(142,142,'cotisation',10,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(143,143,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(144,144,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(145,145,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(146,146,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(147,147,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(148,148,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(149,149,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(150,150,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(151,151,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(152,152,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(153,153,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(154,154,'cotisation',11,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(155,155,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(156,156,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(157,157,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(158,158,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(159,159,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(160,160,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(161,161,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(162,162,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(163,163,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(164,164,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(165,165,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(166,166,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(167,167,'cotisation',12,NULL,NULL,25000);
+INSERT INTO "lignes_paiement" VALUES(168,168,'evenement',NULL,NULL,1,5000);
+INSERT INTO "lignes_paiement" VALUES(169,169,'evenement',NULL,NULL,1,5000);
+INSERT INTO "lignes_paiement" VALUES(170,170,'evenement',NULL,NULL,1,2000);
+INSERT INTO "lignes_paiement" VALUES(171,171,'evenement',NULL,NULL,1,5000);
+INSERT INTO "lignes_paiement" VALUES(172,172,'evenement',NULL,NULL,1,10000);
+INSERT INTO "lignes_paiement" VALUES(173,173,'evenement',NULL,NULL,1,5000);
+INSERT INTO "lignes_paiement" VALUES(174,174,'evenement',NULL,NULL,1,5000);
+INSERT INTO "lignes_paiement" VALUES(175,175,'evenement',NULL,NULL,1,5000);
+INSERT INTO "lignes_paiement" VALUES(176,176,'evenement',NULL,NULL,1,2000);
+INSERT INTO "lignes_paiement" VALUES(177,177,'evenement',NULL,NULL,1,5000);
+INSERT INTO "lignes_paiement" VALUES(178,178,'evenement',NULL,NULL,1,5000);
+INSERT INTO "lignes_paiement" VALUES(179,179,'evenement',NULL,NULL,2,1000);
+INSERT INTO "lignes_paiement" VALUES(180,180,'evenement',NULL,NULL,2,2000);
+INSERT INTO "lignes_paiement" VALUES(181,181,'evenement',NULL,NULL,2,2000);
+INSERT INTO "lignes_paiement" VALUES(182,182,'evenement',NULL,NULL,2,2000);
+INSERT INTO "lignes_paiement" VALUES(183,183,'evenement',NULL,NULL,2,2000);
+INSERT INTO "lignes_paiement" VALUES(184,184,'evenement',NULL,NULL,2,1000);
+INSERT INTO "lignes_paiement" VALUES(185,185,'evenement',NULL,NULL,2,2000);
+INSERT INTO "lignes_paiement" VALUES(186,186,'evenement',NULL,NULL,2,5000);
+INSERT INTO "lignes_paiement" VALUES(187,187,'evenement',NULL,NULL,2,2000);
+INSERT INTO "lignes_paiement" VALUES(188,188,'evenement',NULL,NULL,2,5000);
+INSERT INTO "lignes_paiement" VALUES(189,189,'evenement',NULL,NULL,2,1000);
+INSERT INTO "lignes_paiement" VALUES(190,190,'evenement',NULL,NULL,2,2000);
+INSERT INTO "lignes_paiement" VALUES(191,191,'evenement',NULL,NULL,2,2000);
+INSERT INTO "lignes_paiement" VALUES(192,192,'evenement',NULL,NULL,3,2000);
+INSERT INTO "lignes_paiement" VALUES(193,193,'evenement',NULL,NULL,3,5000);
+INSERT INTO "lignes_paiement" VALUES(194,194,'evenement',NULL,NULL,3,5000);
+INSERT INTO "lignes_paiement" VALUES(195,195,'evenement',NULL,NULL,3,2000);
+INSERT INTO "lignes_paiement" VALUES(196,196,'evenement',NULL,NULL,3,5000);
+INSERT INTO "lignes_paiement" VALUES(197,197,'evenement',NULL,NULL,3,5000);
+INSERT INTO "lignes_paiement" VALUES(198,198,'cotisation',26,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(199,199,'cotisation',26,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(200,200,'cotisation',26,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(201,201,'cotisation',26,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(202,202,'cotisation',26,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(203,203,'cotisation',26,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(204,204,'cotisation',26,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(205,205,'cotisation',26,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(206,206,'cotisation',26,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(207,207,'cotisation',27,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(208,208,'cotisation',27,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(209,209,'cotisation',27,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(210,210,'cotisation',27,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(211,211,'cotisation',27,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(212,212,'cotisation',27,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(213,213,'cotisation',27,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(214,214,'cotisation',27,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(215,215,'cotisation',27,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(216,216,'cotisation',28,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(217,217,'cotisation',28,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(218,218,'cotisation',28,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(219,219,'cotisation',28,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(220,220,'cotisation',28,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(221,221,'cotisation',28,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(222,222,'cotisation',28,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(223,223,'cotisation',28,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(224,224,'cotisation',29,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(225,225,'cotisation',29,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(226,226,'cotisation',29,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(227,227,'cotisation',29,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(228,228,'cotisation',30,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(229,229,'cotisation',30,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(230,230,'cotisation',30,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(231,231,'cotisation',30,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(232,232,'cotisation',30,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(233,233,'cotisation',30,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(234,234,'cotisation',30,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(235,235,'cotisation',30,NULL,NULL,10000);
+INSERT INTO "lignes_paiement" VALUES(236,236,'evenement',NULL,NULL,4,1000);
+INSERT INTO "lignes_paiement" VALUES(237,237,'evenement',NULL,NULL,4,1000);
+INSERT INTO "lignes_paiement" VALUES(238,238,'evenement',NULL,NULL,4,5000);
+INSERT INTO "lignes_paiement" VALUES(239,239,'evenement',NULL,NULL,4,1000);
+INSERT INTO "lignes_paiement" VALUES(240,240,'evenement',NULL,NULL,4,2000);
+INSERT INTO "lignes_paiement" VALUES(241,241,'cotisation',38,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(242,242,'cotisation',38,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(243,243,'cotisation',38,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(244,244,'cotisation',38,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(245,245,'cotisation',38,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(246,246,'cotisation',39,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(247,247,'cotisation',39,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(248,248,'cotisation',39,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(249,249,'cotisation',39,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(250,250,'cotisation',39,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(251,251,'cotisation',40,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(252,252,'cotisation',40,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(253,253,'cotisation',40,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(254,254,'cotisation',40,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(255,255,'cotisation',41,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(256,256,'cotisation',41,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(257,257,'cotisation',41,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(258,258,'cotisation',42,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(259,259,'cotisation',42,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(260,260,'cotisation',42,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(261,261,'cotisation',42,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(262,262,'cotisation',42,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(263,263,'cotisation',42,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(264,264,'cotisation',43,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(265,265,'cotisation',43,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(266,266,'cotisation',43,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(267,267,'cotisation',43,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(268,268,'cotisation',44,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(269,269,'cotisation',44,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(270,270,'cotisation',44,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(271,271,'cotisation',44,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(272,272,'cotisation',45,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(273,273,'cotisation',45,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(274,274,'cotisation',45,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(275,275,'cotisation',45,NULL,NULL,15000);
+INSERT INTO "lignes_paiement" VALUES(276,276,'evenement',NULL,NULL,5,5000);
+INSERT INTO "lignes_paiement" VALUES(277,277,'evenement',NULL,NULL,5,5000);
+CREATE TABLE notifications (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    utilisateur_id INTEGER NOT NULL REFERENCES utilisateurs (id),
+    tontine_id     INTEGER REFERENCES tontines (id),
+    message        TEXT    NOT NULL,
+    lue            INTEGER NOT NULL DEFAULT 0 CHECK (lue IN (0, 1)),
+    date_creation  TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+INSERT INTO "notifications" VALUES(1,1,1,'Votre cotisation de la séance n° 12 est enregistrée.',0,'2026-10-23 20:43:55');
+INSERT INTO "notifications" VALUES(2,3,2,'Pénalité de 500 FCFA (retard) pour la séance n° 2.',0,'2026-10-23 20:43:55');
+INSERT INTO "notifications" VALUES(3,32,3,'Une personne demande à rejoindre la tontine.',0,'2026-10-23 20:43:55');
+INSERT INTO "notifications" VALUES(4,32,3,'Un nouveau membre a rejoint la tontine.',0,'2026-10-23 20:43:55');
+CREATE TABLE paiements (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    adhesion_id       INTEGER NOT NULL REFERENCES adhesions (id),
+    operateur         TEXT    NOT NULL CHECK (operateur IN ('orange_money', 'mtn_momo')),
+    telephone         TEXT    NOT NULL CHECK (length(telephone) = 9),
+    montant           INTEGER NOT NULL CHECK (montant > 0),
+    reference         TEXT    NOT NULL UNIQUE,
+    statut            TEXT    NOT NULL DEFAULT 'en_attente' CHECK (statut IN ('en_attente', 'reussi', 'echoue')),
+    motif_echec       TEXT,
+    date_creation     TEXT    NOT NULL,
+    date_confirmation TEXT
+);
+INSERT INTO "paiements" VALUES(1,1,'mtn_momo','677000001',25000,'PAYF5GZJDXH4','reussi',NULL,'2025-11-12 10:00:00','2025-11-12 10:01:00');
+INSERT INTO "paiements" VALUES(2,2,'orange_money','677000002',25000,'PAY5DUVYGPK8','reussi',NULL,'2025-11-13 10:00:00','2025-11-13 10:01:00');
+INSERT INTO "paiements" VALUES(3,4,'orange_money','677000004',25000,'PAYGYZHTQ5BT','reussi',NULL,'2025-11-10 10:00:00','2025-11-10 10:01:00');
+INSERT INTO "paiements" VALUES(4,5,'orange_money','696073292',25000,'PAYMTVXYAMK3','reussi',NULL,'2025-11-11 10:00:00','2025-11-11 10:01:00');
+INSERT INTO "paiements" VALUES(5,7,'mtn_momo','672710343',25000,'PAYKBFP247XL','reussi',NULL,'2025-11-13 10:00:00','2025-11-13 10:01:00');
+INSERT INTO "paiements" VALUES(6,10,'mtn_momo','655438436',25000,'PAYVWFDKLDFT','reussi',NULL,'2025-11-12 10:00:00','2025-11-12 10:01:00');
+INSERT INTO "paiements" VALUES(7,12,'orange_money','690326765',25000,'PAY5964TPHY5','reussi',NULL,'2025-11-10 10:00:00','2025-11-10 10:01:00');
+INSERT INTO "paiements" VALUES(8,17,'mtn_momo','662320821',25000,'PAYU9VCQ3DAP','reussi',NULL,'2025-11-13 10:00:00','2025-11-13 10:01:00');
+INSERT INTO "paiements" VALUES(9,18,'orange_money','668517485',25000,'PAYPJSUWHA95','reussi',NULL,'2025-11-10 10:00:00','2025-11-10 10:01:00');
+INSERT INTO "paiements" VALUES(10,19,'mtn_momo','678398441',25000,'PAYJ2QYE3C5B','reussi',NULL,'2025-11-11 10:00:00','2025-11-11 10:01:00');
+INSERT INTO "paiements" VALUES(11,20,'mtn_momo','662684052',25000,'PAYEW534UH3B','reussi',NULL,'2025-11-13 10:00:00','2025-11-13 10:01:00');
+INSERT INTO "paiements" VALUES(12,21,'orange_money','669515702',25000,'PAYL7ZF5GR53','reussi',NULL,'2025-11-11 10:00:00','2025-11-11 10:01:00');
+INSERT INTO "paiements" VALUES(13,23,'mtn_momo','674017343',25000,'PAY3VXQXLEHN','reussi',NULL,'2025-11-21 10:00:00','2025-11-21 10:01:00');
+INSERT INTO "paiements" VALUES(14,24,'orange_money','654041154',25000,'PAYYKRGKSNMK','reussi',NULL,'2025-11-13 10:00:00','2025-11-13 10:01:00');
+INSERT INTO "paiements" VALUES(15,1,'mtn_momo','677000001',25000,'PAYM976WWK6E','reussi',NULL,'2025-12-13 10:00:00','2025-12-13 10:01:00');
+INSERT INTO "paiements" VALUES(16,2,'orange_money','677000002',25000,'PAY6VTDYEV76','reussi',NULL,'2025-12-13 10:00:00','2025-12-13 10:01:00');
+INSERT INTO "paiements" VALUES(17,10,'orange_money','655438436',25000,'PAYDZUEF27C6','reussi',NULL,'2025-12-13 10:00:00','2025-12-13 10:01:00');
+INSERT INTO "paiements" VALUES(18,13,'orange_money','690054447',25000,'PAYW8KD6GXFM','reussi',NULL,'2025-12-12 10:00:00','2025-12-12 10:01:00');
+INSERT INTO "paiements" VALUES(19,14,'mtn_momo','679807725',25000,'PAYR66LZZU24','reussi',NULL,'2025-12-13 10:00:00','2025-12-13 10:01:00');
+INSERT INTO "paiements" VALUES(20,15,'mtn_momo','692653446',25000,'PAYDXEXG2USK','reussi',NULL,'2025-12-18 10:00:00','2025-12-18 10:01:00');
+INSERT INTO "paiements" VALUES(21,16,'mtn_momo','691065818',25000,'PAYFKYV3JFV2','reussi',NULL,'2025-12-18 10:00:00','2025-12-18 10:01:00');
+INSERT INTO "paiements" VALUES(22,17,'mtn_momo','662320821',25000,'PAYJF5ZBZVMP','reussi',NULL,'2025-12-12 10:00:00','2025-12-12 10:01:00');
+INSERT INTO "paiements" VALUES(23,18,'mtn_momo','668517485',25000,'PAY9NQJKEUGC','reussi',NULL,'2025-12-15 10:00:00','2025-12-15 10:01:00');
+INSERT INTO "paiements" VALUES(24,19,'mtn_momo','678398441',25000,'PAYJ2KLML6C4','reussi',NULL,'2025-12-11 10:00:00','2025-12-11 10:01:00');
+INSERT INTO "paiements" VALUES(25,21,'mtn_momo','669515702',25000,'PAYR6U6QRV8N','reussi',NULL,'2025-12-11 10:00:00','2025-12-11 10:01:00');
+INSERT INTO "paiements" VALUES(26,22,'orange_money','696637601',25000,'PAY67U24LNJS','reussi',NULL,'2025-12-11 10:00:00','2025-12-11 10:01:00');
+INSERT INTO "paiements" VALUES(27,24,'orange_money','654041154',25000,'PAY8ZGHUFLT6','reussi',NULL,'2025-12-13 10:00:00','2025-12-13 10:01:00');
+INSERT INTO "paiements" VALUES(28,25,'mtn_momo','672342608',25000,'PAY5FQ6YB4D3','reussi',NULL,'2025-12-17 10:00:00','2025-12-17 10:01:00');
+INSERT INTO "paiements" VALUES(29,1,'orange_money','677000001',25000,'PAYR2FZQBWGX','reussi',NULL,'2026-01-12 10:00:00','2026-01-12 10:01:00');
+INSERT INTO "paiements" VALUES(30,5,'orange_money','696073292',25000,'PAYJCU8J86AF','reussi',NULL,'2026-01-11 10:00:00','2026-01-11 10:01:00');
+INSERT INTO "paiements" VALUES(31,7,'orange_money','672710343',25000,'PAYSPK5HURVH','reussi',NULL,'2026-01-11 10:00:00','2026-01-11 10:01:00');
+INSERT INTO "paiements" VALUES(32,8,'mtn_momo','691525206',25000,'PAYR47EH9BRK','reussi',NULL,'2026-01-11 10:00:00','2026-01-11 10:01:00');
+INSERT INTO "paiements" VALUES(33,10,'orange_money','655438436',25000,'PAY5AYR4MFZE','reussi',NULL,'2026-01-18 10:00:00','2026-01-18 10:01:00');
+INSERT INTO "paiements" VALUES(34,13,'mtn_momo','690054447',25000,'PAY28C2ZSBYE','reussi',NULL,'2026-01-10 10:00:00','2026-01-10 10:01:00');
+INSERT INTO "paiements" VALUES(35,15,'mtn_momo','692653446',25000,'PAYRGXJCYXM7','reussi',NULL,'2026-01-12 10:00:00','2026-01-12 10:01:00');
+INSERT INTO "paiements" VALUES(36,17,'orange_money','662320821',25000,'PAYMJE7CUNCN','reussi',NULL,'2026-01-18 10:00:00','2026-01-18 10:01:00');
+INSERT INTO "paiements" VALUES(37,19,'orange_money','678398441',25000,'PAYWV38SCNUY','reussi',NULL,'2026-01-15 10:00:00','2026-01-15 10:01:00');
+INSERT INTO "paiements" VALUES(38,22,'orange_money','696637601',25000,'PAYXTHZ5362X','reussi',NULL,'2026-01-18 10:00:00','2026-01-18 10:01:00');
+INSERT INTO "paiements" VALUES(39,23,'mtn_momo','674017343',25000,'PAY99ZTF5F5M','reussi',NULL,'2026-01-13 10:00:00','2026-01-13 10:01:00');
+INSERT INTO "paiements" VALUES(40,5,'mtn_momo','696073292',25000,'PAYWGFWUV65L','reussi',NULL,'2026-02-12 10:00:00','2026-02-12 10:01:00');
+INSERT INTO "paiements" VALUES(41,6,'mtn_momo','662564217',25000,'PAYY6CY5TDE3','reussi',NULL,'2026-02-17 10:00:00','2026-02-17 10:01:00');
+INSERT INTO "paiements" VALUES(42,7,'mtn_momo','672710343',25000,'PAYLBK6CJERZ','reussi',NULL,'2026-02-13 10:00:00','2026-02-13 10:01:00');
+INSERT INTO "paiements" VALUES(43,9,'mtn_momo','699790057',25000,'PAY2CK6ZZ6EJ','reussi',NULL,'2026-02-21 10:00:00','2026-02-21 10:01:00');
+INSERT INTO "paiements" VALUES(44,10,'orange_money','655438436',25000,'PAY3WTRHBM92','reussi',NULL,'2026-02-13 10:00:00','2026-02-13 10:01:00');
+INSERT INTO "paiements" VALUES(45,12,'orange_money','690326765',25000,'PAYSS6PU9NHJ','reussi',NULL,'2026-02-15 10:00:00','2026-02-15 10:01:00');
+INSERT INTO "paiements" VALUES(46,14,'orange_money','679807725',25000,'PAY6M6FWYEUV','reussi',NULL,'2026-02-15 10:00:00','2026-02-15 10:01:00');
+INSERT INTO "paiements" VALUES(47,15,'mtn_momo','692653446',25000,'PAYMZQHNJR9B','reussi',NULL,'2026-02-12 10:00:00','2026-02-12 10:01:00');
+INSERT INTO "paiements" VALUES(48,16,'mtn_momo','691065818',25000,'PAYZ7JFEV384','reussi',NULL,'2026-02-18 10:00:00','2026-02-18 10:01:00');
+INSERT INTO "paiements" VALUES(49,19,'orange_money','678398441',25000,'PAYEJWE67YJM','reussi',NULL,'2026-02-15 10:00:00','2026-02-15 10:01:00');
+INSERT INTO "paiements" VALUES(50,21,'mtn_momo','669515702',25000,'PAY5DHKVLLWQ','reussi',NULL,'2026-02-18 10:00:00','2026-02-18 10:01:00');
+INSERT INTO "paiements" VALUES(51,22,'orange_money','696637601',25000,'PAYUFSNTJVFL','reussi',NULL,'2026-02-10 10:00:00','2026-02-10 10:01:00');
+INSERT INTO "paiements" VALUES(52,23,'orange_money','674017343',25000,'PAYLXCBFCSP4','reussi',NULL,'2026-02-21 10:00:00','2026-02-21 10:01:00');
+INSERT INTO "paiements" VALUES(53,24,'orange_money','654041154',25000,'PAY9UV8R3V7E','reussi',NULL,'2026-02-15 10:00:00','2026-02-15 10:01:00');
+INSERT INTO "paiements" VALUES(54,1,'mtn_momo','677000001',25000,'PAYL6487PXKW','reussi',NULL,'2026-03-10 10:00:00','2026-03-10 10:01:00');
+INSERT INTO "paiements" VALUES(55,4,'mtn_momo','677000004',25000,'PAYY3JZGWR7H','reussi',NULL,'2026-03-12 10:00:00','2026-03-12 10:01:00');
+INSERT INTO "paiements" VALUES(56,5,'orange_money','696073292',25000,'PAY6RKGDU24R','reussi',NULL,'2026-03-12 10:00:00','2026-03-12 10:01:00');
+INSERT INTO "paiements" VALUES(57,6,'orange_money','662564217',25000,'PAYWWNL979V9','reussi',NULL,'2026-03-17 10:00:00','2026-03-17 10:01:00');
+INSERT INTO "paiements" VALUES(58,8,'mtn_momo','691525206',25000,'PAYF37RPYDDU','reussi',NULL,'2026-03-11 10:00:00','2026-03-11 10:01:00');
+INSERT INTO "paiements" VALUES(59,9,'mtn_momo','699790057',25000,'PAY8UAG5JSZ3','reussi',NULL,'2026-03-17 10:00:00','2026-03-17 10:01:00');
+INSERT INTO "paiements" VALUES(60,10,'mtn_momo','655438436',25000,'PAYC3DNZUE26','reussi',NULL,'2026-03-15 10:00:00','2026-03-15 10:01:00');
+INSERT INTO "paiements" VALUES(61,12,'mtn_momo','690326765',25000,'PAYHJG3ZXZKN','reussi',NULL,'2026-03-12 10:00:00','2026-03-12 10:01:00');
+INSERT INTO "paiements" VALUES(62,14,'mtn_momo','679807725',25000,'PAYCCCJX87KJ','reussi',NULL,'2026-03-13 10:00:00','2026-03-13 10:01:00');
+INSERT INTO "paiements" VALUES(63,15,'mtn_momo','692653446',25000,'PAYWL3VX9V8B','reussi',NULL,'2026-03-10 10:00:00','2026-03-10 10:01:00');
+INSERT INTO "paiements" VALUES(64,17,'mtn_momo','662320821',25000,'PAYXH4VB8SQD','reussi',NULL,'2026-03-13 10:00:00','2026-03-13 10:01:00');
+INSERT INTO "paiements" VALUES(65,20,'mtn_momo','662684052',25000,'PAYL2KRCHNB6','reussi',NULL,'2026-03-18 10:00:00','2026-03-18 10:01:00');
+INSERT INTO "paiements" VALUES(66,21,'mtn_momo','669515702',25000,'PAY4K4P48DJP','reussi',NULL,'2026-03-11 10:00:00','2026-03-11 10:01:00');
+INSERT INTO "paiements" VALUES(67,22,'orange_money','696637601',25000,'PAY82WM7XYS8','reussi',NULL,'2026-03-13 10:00:00','2026-03-13 10:01:00');
+INSERT INTO "paiements" VALUES(68,23,'mtn_momo','674017343',25000,'PAYRTVQVUP9W','reussi',NULL,'2026-03-21 10:00:00','2026-03-21 10:01:00');
+INSERT INTO "paiements" VALUES(69,24,'orange_money','654041154',25000,'PAYYTUH23YKU','reussi',NULL,'2026-03-10 10:00:00','2026-03-10 10:01:00');
+INSERT INTO "paiements" VALUES(70,1,'mtn_momo','677000001',25000,'PAYUFY6S8PNT','reussi',NULL,'2026-04-12 10:00:00','2026-04-12 10:01:00');
+INSERT INTO "paiements" VALUES(71,3,'mtn_momo','699000003',25000,'PAYJGRRDQQDG','reussi',NULL,'2026-04-11 10:00:00','2026-04-11 10:01:00');
+INSERT INTO "paiements" VALUES(72,4,'orange_money','677000004',25000,'PAYX8GJAL488','reussi',NULL,'2026-04-12 10:00:00','2026-04-12 10:01:00');
+INSERT INTO "paiements" VALUES(73,5,'orange_money','696073292',25000,'PAYUWUDFQCM4','reussi',NULL,'2026-04-18 10:00:00','2026-04-18 10:01:00');
+INSERT INTO "paiements" VALUES(74,7,'mtn_momo','672710343',25000,'PAYC39MUCAVG','reussi',NULL,'2026-04-13 10:00:00','2026-04-13 10:01:00');
+INSERT INTO "paiements" VALUES(75,8,'orange_money','691525206',25000,'PAYU79J7TNHX','reussi',NULL,'2026-04-12 10:00:00','2026-04-12 10:01:00');
+INSERT INTO "paiements" VALUES(76,9,'mtn_momo','699790057',25000,'PAY7SMAXUNM3','reussi',NULL,'2026-04-21 10:00:00','2026-04-21 10:01:00');
+INSERT INTO "paiements" VALUES(77,10,'orange_money','655438436',25000,'PAYWF3GMJ8WR','reussi',NULL,'2026-04-10 10:00:00','2026-04-10 10:01:00');
+INSERT INTO "paiements" VALUES(78,11,'mtn_momo','673567281',25000,'PAYS2R6TXVAS','reussi',NULL,'2026-04-17 10:00:00','2026-04-17 10:01:00');
+INSERT INTO "paiements" VALUES(79,12,'mtn_momo','690326765',25000,'PAYRDH7VL3VH','reussi',NULL,'2026-04-12 10:00:00','2026-04-12 10:01:00');
+INSERT INTO "paiements" VALUES(80,13,'mtn_momo','690054447',25000,'PAYZQQJ8K7Z4','reussi',NULL,'2026-04-13 10:00:00','2026-04-13 10:01:00');
+INSERT INTO "paiements" VALUES(81,16,'orange_money','691065818',25000,'PAYPRF6ZEHDN','reussi',NULL,'2026-04-11 10:00:00','2026-04-11 10:01:00');
+INSERT INTO "paiements" VALUES(82,21,'mtn_momo','669515702',25000,'PAYLW6HP9F6D','reussi',NULL,'2026-04-18 10:00:00','2026-04-18 10:01:00');
+INSERT INTO "paiements" VALUES(83,22,'orange_money','696637601',25000,'PAYJ47D7VB3S','reussi',NULL,'2026-04-13 10:00:00','2026-04-13 10:01:00');
+INSERT INTO "paiements" VALUES(84,24,'orange_money','654041154',25000,'PAYPEC5YEDE8','reussi',NULL,'2026-04-13 10:00:00','2026-04-13 10:01:00');
+INSERT INTO "paiements" VALUES(85,25,'mtn_momo','672342608',25000,'PAYU4MJ4Z262','reussi',NULL,'2026-04-13 10:00:00','2026-04-13 10:01:00');
+INSERT INTO "paiements" VALUES(86,1,'orange_money','677000001',25000,'PAYFJYHM3JQA','reussi',NULL,'2026-05-11 10:00:00','2026-05-11 10:01:00');
+INSERT INTO "paiements" VALUES(87,4,'mtn_momo','677000004',25000,'PAYV752QR7YK','reussi',NULL,'2026-05-18 10:00:00','2026-05-18 10:01:00');
+INSERT INTO "paiements" VALUES(88,5,'orange_money','696073292',25000,'PAYNHC4BRPEG','reussi',NULL,'2026-05-15 10:00:00','2026-05-15 10:01:00');
+INSERT INTO "paiements" VALUES(89,8,'orange_money','691525206',25000,'PAY6DRC36QPD','reussi',NULL,'2026-05-13 10:00:00','2026-05-13 10:01:00');
+INSERT INTO "paiements" VALUES(90,9,'mtn_momo','699790057',25000,'PAYUQWWRVKQ4','reussi',NULL,'2026-05-13 10:00:00','2026-05-13 10:01:00');
+INSERT INTO "paiements" VALUES(91,10,'mtn_momo','655438436',25000,'PAYTDM59DY2W','reussi',NULL,'2026-05-18 10:00:00','2026-05-18 10:01:00');
+INSERT INTO "paiements" VALUES(92,13,'orange_money','690054447',25000,'PAY4KV2M8RQV','reussi',NULL,'2026-05-12 10:00:00','2026-05-12 10:01:00');
+INSERT INTO "paiements" VALUES(93,15,'mtn_momo','692653446',25000,'PAY7D44J2RSP','reussi',NULL,'2026-05-13 10:00:00','2026-05-13 10:01:00');
+INSERT INTO "paiements" VALUES(94,16,'orange_money','691065818',25000,'PAYF6ZFNDT2C','reussi',NULL,'2026-05-11 10:00:00','2026-05-11 10:01:00');
+INSERT INTO "paiements" VALUES(95,18,'orange_money','668517485',25000,'PAYNP8PXVAPN','reussi',NULL,'2026-05-18 10:00:00','2026-05-18 10:01:00');
+INSERT INTO "paiements" VALUES(96,20,'mtn_momo','662684052',25000,'PAY8RP3RWU27','reussi',NULL,'2026-05-13 10:00:00','2026-05-13 10:01:00');
+INSERT INTO "paiements" VALUES(97,22,'mtn_momo','696637601',25000,'PAYVSZ97G8WP','reussi',NULL,'2026-05-11 10:00:00','2026-05-11 10:01:00');
+INSERT INTO "paiements" VALUES(98,25,'orange_money','672342608',25000,'PAYW4CQKBS4U','reussi',NULL,'2026-05-25 10:00:00','2026-05-25 10:01:00');
+INSERT INTO "paiements" VALUES(99,1,'mtn_momo','677000001',25000,'PAYNXQ2R9XS9','reussi',NULL,'2026-06-13 10:00:00','2026-06-13 10:01:00');
+INSERT INTO "paiements" VALUES(100,3,'orange_money','699000003',25000,'PAY7LYLJ9MDC','reussi',NULL,'2026-06-10 10:00:00','2026-06-10 10:01:00');
+INSERT INTO "paiements" VALUES(101,5,'mtn_momo','696073292',25000,'PAYDA4JQEKAP','reussi',NULL,'2026-06-18 10:00:00','2026-06-18 10:01:00');
+INSERT INTO "paiements" VALUES(102,8,'mtn_momo','691525206',25000,'PAYZD89BA4AB','reussi',NULL,'2026-06-15 10:00:00','2026-06-15 10:01:00');
+INSERT INTO "paiements" VALUES(103,10,'mtn_momo','655438436',25000,'PAYUB5MGGKRN','reussi',NULL,'2026-06-13 10:00:00','2026-06-13 10:01:00');
+INSERT INTO "paiements" VALUES(104,11,'mtn_momo','673567281',25000,'PAYYT3FZ37RQ','reussi',NULL,'2026-06-17 10:00:00','2026-06-17 10:01:00');
+INSERT INTO "paiements" VALUES(105,12,'orange_money','690326765',25000,'PAYFCF3228DA','reussi',NULL,'2026-06-13 10:00:00','2026-06-13 10:01:00');
+INSERT INTO "paiements" VALUES(106,14,'mtn_momo','679807725',25000,'PAYF95XGCQP8','reussi',NULL,'2026-06-13 10:00:00','2026-06-13 10:01:00');
+INSERT INTO "paiements" VALUES(107,15,'mtn_momo','692653446',25000,'PAYCETCMWBPK','reussi',NULL,'2026-06-13 10:00:00','2026-06-13 10:01:00');
+INSERT INTO "paiements" VALUES(108,16,'mtn_momo','691065818',25000,'PAYEVLR2X2JF','reussi',NULL,'2026-06-13 10:00:00','2026-06-13 10:01:00');
+INSERT INTO "paiements" VALUES(109,17,'mtn_momo','662320821',25000,'PAYDG5QEX3WB','reussi',NULL,'2026-06-11 10:00:00','2026-06-11 10:01:00');
+INSERT INTO "paiements" VALUES(110,18,'mtn_momo','668517485',25000,'PAY69QY25M2F','reussi',NULL,'2026-06-18 10:00:00','2026-06-18 10:01:00');
+INSERT INTO "paiements" VALUES(111,19,'mtn_momo','678398441',25000,'PAYREFTK2K2W','reussi',NULL,'2026-06-15 10:00:00','2026-06-15 10:01:00');
+INSERT INTO "paiements" VALUES(112,21,'orange_money','669515702',25000,'PAYGFAV6ZTGJ','reussi',NULL,'2026-06-15 10:00:00','2026-06-15 10:01:00');
+INSERT INTO "paiements" VALUES(113,25,'mtn_momo','672342608',25000,'PAYM564GBFYF','reussi',NULL,'2026-06-21 10:00:00','2026-06-21 10:01:00');
+INSERT INTO "paiements" VALUES(114,1,'orange_money','677000001',25000,'PAY2AU42FRL2','reussi',NULL,'2026-07-15 10:00:00','2026-07-15 10:01:00');
+INSERT INTO "paiements" VALUES(115,3,'mtn_momo','699000003',25000,'PAYJTVT9KEL5','reussi',NULL,'2026-07-15 10:00:00','2026-07-15 10:01:00');
+INSERT INTO "paiements" VALUES(116,4,'mtn_momo','677000004',25000,'PAY4V8EZSR9N','reussi',NULL,'2026-07-13 10:00:00','2026-07-13 10:01:00');
+INSERT INTO "paiements" VALUES(117,5,'mtn_momo','696073292',25000,'PAYGJVA3X2X6','reussi',NULL,'2026-07-15 10:00:00','2026-07-15 10:01:00');
+INSERT INTO "paiements" VALUES(118,6,'mtn_momo','662564217',25000,'PAY5JVWN8WM3','reussi',NULL,'2026-07-15 10:00:00','2026-07-15 10:01:00');
+INSERT INTO "paiements" VALUES(119,8,'orange_money','691525206',25000,'PAYU9RW2T3ZH','reussi',NULL,'2026-07-18 10:00:00','2026-07-18 10:01:00');
+INSERT INTO "paiements" VALUES(120,10,'orange_money','655438436',25000,'PAYMB7P6UE49','reussi',NULL,'2026-07-13 10:00:00','2026-07-13 10:01:00');
+INSERT INTO "paiements" VALUES(121,11,'mtn_momo','673567281',25000,'PAYVRSK52E68','reussi',NULL,'2026-07-15 10:00:00','2026-07-15 10:01:00');
+INSERT INTO "paiements" VALUES(122,12,'mtn_momo','690326765',25000,'PAY4CZFGRYLC','reussi',NULL,'2026-07-11 10:00:00','2026-07-11 10:01:00');
+INSERT INTO "paiements" VALUES(123,16,'mtn_momo','691065818',25000,'PAYX5GAGSQQ6','reussi',NULL,'2026-07-13 10:00:00','2026-07-13 10:01:00');
+INSERT INTO "paiements" VALUES(124,19,'orange_money','678398441',25000,'PAY37KYB8GU4','reussi',NULL,'2026-07-13 10:00:00','2026-07-13 10:01:00');
+INSERT INTO "paiements" VALUES(125,20,'mtn_momo','662684052',25000,'PAYHKYVX7P8Y','reussi',NULL,'2026-07-13 10:00:00','2026-07-13 10:01:00');
+INSERT INTO "paiements" VALUES(126,21,'mtn_momo','669515702',25000,'PAYG66WEVCHB','reussi',NULL,'2026-07-11 10:00:00','2026-07-11 10:01:00');
+INSERT INTO "paiements" VALUES(127,22,'mtn_momo','696637601',25000,'PAYGLRMLX57Q','reussi',NULL,'2026-07-12 10:00:00','2026-07-12 10:01:00');
+INSERT INTO "paiements" VALUES(128,23,'orange_money','674017343',25000,'PAYMM53BN652','reussi',NULL,'2026-07-15 10:00:00','2026-07-15 10:01:00');
+INSERT INTO "paiements" VALUES(129,25,'mtn_momo','672342608',25000,'PAYPPTEGMZWN','reussi',NULL,'2026-07-25 10:00:00','2026-07-25 10:01:00');
+INSERT INTO "paiements" VALUES(130,1,'mtn_momo','677000001',25000,'PAYHS9W23HYY','reussi',NULL,'2026-08-11 10:00:00','2026-08-11 10:01:00');
+INSERT INTO "paiements" VALUES(131,3,'orange_money','699000003',25000,'PAYMVFJWHRVH','reussi',NULL,'2026-08-13 10:00:00','2026-08-13 10:01:00');
+INSERT INTO "paiements" VALUES(132,5,'orange_money','696073292',25000,'PAYZK24J25M9','reussi',NULL,'2026-08-11 10:00:00','2026-08-11 10:01:00');
+INSERT INTO "paiements" VALUES(133,7,'orange_money','672710343',25000,'PAYL9UJMW6DY','reussi',NULL,'2026-08-15 10:00:00','2026-08-15 10:01:00');
+INSERT INTO "paiements" VALUES(134,8,'mtn_momo','691525206',25000,'PAY9JN294946','reussi',NULL,'2026-08-11 10:00:00','2026-08-11 10:01:00');
+INSERT INTO "paiements" VALUES(135,10,'orange_money','655438436',25000,'PAYLFBQUCTQU','reussi',NULL,'2026-08-13 10:00:00','2026-08-13 10:01:00');
+INSERT INTO "paiements" VALUES(136,13,'mtn_momo','690054447',25000,'PAY79HHTZC6P','reussi',NULL,'2026-08-10 10:00:00','2026-08-10 10:01:00');
+INSERT INTO "paiements" VALUES(137,16,'orange_money','691065818',25000,'PAYGRVC6SYF6','reussi',NULL,'2026-08-13 10:00:00','2026-08-13 10:01:00');
+INSERT INTO "paiements" VALUES(138,18,'mtn_momo','668517485',25000,'PAYRPY5LJPPD','reussi',NULL,'2026-08-11 10:00:00','2026-08-11 10:01:00');
+INSERT INTO "paiements" VALUES(139,19,'orange_money','678398441',25000,'PAYTLWUUTGJ4','reussi',NULL,'2026-08-12 10:00:00','2026-08-12 10:01:00');
+INSERT INTO "paiements" VALUES(140,20,'orange_money','662684052',25000,'PAYTJJRKWR39','reussi',NULL,'2026-08-10 10:00:00','2026-08-10 10:01:00');
+INSERT INTO "paiements" VALUES(141,21,'mtn_momo','669515702',25000,'PAYT426EF3TZ','reussi',NULL,'2026-08-13 10:00:00','2026-08-13 10:01:00');
+INSERT INTO "paiements" VALUES(142,24,'mtn_momo','654041154',25000,'PAY9WAF7YE3P','reussi',NULL,'2026-08-13 10:00:00','2026-08-13 10:01:00');
+INSERT INTO "paiements" VALUES(143,2,'orange_money','677000002',25000,'PAYP9TWUXJ9X','reussi',NULL,'2026-09-10 10:00:00','2026-09-10 10:01:00');
+INSERT INTO "paiements" VALUES(144,3,'mtn_momo','699000003',25000,'PAYCG7BHL67A','reussi',NULL,'2026-09-11 10:00:00','2026-09-11 10:01:00');
+INSERT INTO "paiements" VALUES(145,4,'mtn_momo','677000004',25000,'PAYNJVLTFZSF','reussi',NULL,'2026-09-11 10:00:00','2026-09-11 10:01:00');
+INSERT INTO "paiements" VALUES(146,5,'orange_money','696073292',25000,'PAYLD3VQ5FGA','reussi',NULL,'2026-09-10 10:00:00','2026-09-10 10:01:00');
+INSERT INTO "paiements" VALUES(147,11,'mtn_momo','673567281',25000,'PAY8EJQ6AAXH','reussi',NULL,'2026-09-21 10:00:00','2026-09-21 10:01:00');
+INSERT INTO "paiements" VALUES(148,12,'mtn_momo','690326765',25000,'PAYJ8EQ2FGGW','reussi',NULL,'2026-09-13 10:00:00','2026-09-13 10:01:00');
+INSERT INTO "paiements" VALUES(149,13,'mtn_momo','690054447',25000,'PAYVJ2JKEAL6','reussi',NULL,'2026-09-15 10:00:00','2026-09-15 10:01:00');
+INSERT INTO "paiements" VALUES(150,16,'mtn_momo','691065818',25000,'PAYPK46PFGJH','reussi',NULL,'2026-09-10 10:00:00','2026-09-10 10:01:00');
+INSERT INTO "paiements" VALUES(151,18,'orange_money','668517485',25000,'PAYY5WJRTFRU','reussi',NULL,'2026-09-10 10:00:00','2026-09-10 10:01:00');
+INSERT INTO "paiements" VALUES(152,19,'orange_money','678398441',25000,'PAYVPN3UDR92','reussi',NULL,'2026-09-10 10:00:00','2026-09-10 10:01:00');
+INSERT INTO "paiements" VALUES(153,22,'mtn_momo','696637601',25000,'PAYR9EAZWJ24','reussi',NULL,'2026-09-13 10:00:00','2026-09-13 10:01:00');
+INSERT INTO "paiements" VALUES(154,24,'orange_money','654041154',25000,'PAYM8EBEASPC','reussi',NULL,'2026-09-12 10:00:00','2026-09-12 10:01:00');
+INSERT INTO "paiements" VALUES(155,3,'mtn_momo','699000003',25000,'PAY3U453FKTF','reussi',NULL,'2026-10-13 10:00:00','2026-10-13 10:01:00');
+INSERT INTO "paiements" VALUES(156,5,'orange_money','696073292',25000,'PAYFPKW3EV5R','reussi',NULL,'2026-10-13 10:00:00','2026-10-13 10:01:00');
+INSERT INTO "paiements" VALUES(157,7,'orange_money','672710343',25000,'PAYRF5H7DVMH','reussi',NULL,'2026-10-13 10:00:00','2026-10-13 10:01:00');
+INSERT INTO "paiements" VALUES(158,8,'mtn_momo','691525206',25000,'PAYJAL9YSLZJ','reussi',NULL,'2026-10-15 10:00:00','2026-10-15 10:01:00');
+INSERT INTO "paiements" VALUES(159,10,'mtn_momo','655438436',25000,'PAYHBX5TESE9','reussi',NULL,'2026-10-10 10:00:00','2026-10-10 10:01:00');
+INSERT INTO "paiements" VALUES(160,11,'orange_money','673567281',25000,'PAYZD9LZLSGH','reussi',NULL,'2026-10-23 10:00:00','2026-10-23 10:01:00');
+INSERT INTO "paiements" VALUES(161,12,'orange_money','690326765',25000,'PAYACARC8Z2K','reussi',NULL,'2026-10-11 10:00:00','2026-10-11 10:01:00');
+INSERT INTO "paiements" VALUES(162,15,'mtn_momo','692653446',25000,'PAYC4QWR4WTE','reussi',NULL,'2026-10-18 10:00:00','2026-10-18 10:01:00');
+INSERT INTO "paiements" VALUES(163,16,'mtn_momo','691065818',25000,'PAYHDMQC3E7U','reussi',NULL,'2026-10-13 10:00:00','2026-10-13 10:01:00');
+INSERT INTO "paiements" VALUES(164,17,'mtn_momo','662320821',25000,'PAYWF7AZNUVR','reussi',NULL,'2026-10-10 10:00:00','2026-10-10 10:01:00');
+INSERT INTO "paiements" VALUES(165,18,'mtn_momo','668517485',25000,'PAYZ9NRKA4BQ','reussi',NULL,'2026-10-11 10:00:00','2026-10-11 10:01:00');
+INSERT INTO "paiements" VALUES(166,20,'mtn_momo','662684052',25000,'PAYAXA2VGPR4','reussi',NULL,'2026-10-12 10:00:00','2026-10-12 10:01:00');
+INSERT INTO "paiements" VALUES(167,21,'orange_money','669515702',25000,'PAYDKTFCQ4Z7','reussi',NULL,'2026-10-15 10:00:00','2026-10-15 10:01:00');
+INSERT INTO "paiements" VALUES(168,3,'orange_money','699000003',5000,'PAY36RG7GJHA','reussi',NULL,'2026-10-21 15:00:00','2026-10-21 15:01:00');
+INSERT INTO "paiements" VALUES(169,6,'orange_money','662564217',5000,'PAY3ZFSEBEN6','reussi',NULL,'2026-10-21 15:00:00','2026-10-21 15:01:00');
+INSERT INTO "paiements" VALUES(170,22,'orange_money','696637601',2000,'PAY7DL539B25','reussi',NULL,'2026-10-18 15:00:00','2026-10-18 15:01:00');
+INSERT INTO "paiements" VALUES(171,20,'mtn_momo','662684052',5000,'PAYKCRU948DF','reussi',NULL,'2026-10-19 15:00:00','2026-10-19 15:01:00');
+INSERT INTO "paiements" VALUES(172,2,'mtn_momo','677000002',10000,'PAYRB2Y89YW2','reussi',NULL,'2026-10-21 15:00:00','2026-10-21 15:01:00');
+INSERT INTO "paiements" VALUES(173,7,'orange_money','672710343',5000,'PAYQBTD8YQLG','reussi',NULL,'2026-10-23 15:00:00','2026-10-23 15:01:00');
+INSERT INTO "paiements" VALUES(174,11,'orange_money','673567281',5000,'PAYDQ2YMMRWY','reussi',NULL,'2026-10-19 15:00:00','2026-10-19 15:01:00');
+INSERT INTO "paiements" VALUES(175,5,'orange_money','696073292',5000,'PAYN9VM9CFDQ','reussi',NULL,'2026-10-21 15:00:00','2026-10-21 15:01:00');
+INSERT INTO "paiements" VALUES(176,19,'orange_money','678398441',2000,'PAYNJXMWDBKK','reussi',NULL,'2026-10-16 15:00:00','2026-10-16 15:01:00');
+INSERT INTO "paiements" VALUES(177,25,'mtn_momo','672342608',5000,'PAYXVWJL59WM','reussi',NULL,'2026-10-17 15:00:00','2026-10-17 15:01:00');
+INSERT INTO "paiements" VALUES(178,23,'orange_money','674017343',5000,'PAYUJMA3CMWQ','reussi',NULL,'2026-10-21 15:00:00','2026-10-21 15:01:00');
+INSERT INTO "paiements" VALUES(179,16,'orange_money','691065818',1000,'PAY4L492Y2G8','reussi',NULL,'2026-10-23 15:00:00','2026-10-23 15:01:00');
+INSERT INTO "paiements" VALUES(180,5,'mtn_momo','696073292',2000,'PAYCUBWSGEXL','reussi',NULL,'2026-10-16 15:00:00','2026-10-16 15:01:00');
+INSERT INTO "paiements" VALUES(181,11,'orange_money','673567281',2000,'PAYFX8B5L5LD','reussi',NULL,'2026-10-22 15:00:00','2026-10-22 15:01:00');
+INSERT INTO "paiements" VALUES(182,12,'mtn_momo','690326765',2000,'PAY39KDZA5FU','reussi',NULL,'2026-10-20 15:00:00','2026-10-20 15:01:00');
+INSERT INTO "paiements" VALUES(183,23,'mtn_momo','674017343',2000,'PAYLUF8HV389','reussi',NULL,'2026-10-22 15:00:00','2026-10-22 15:01:00');
+INSERT INTO "paiements" VALUES(184,6,'orange_money','662564217',1000,'PAY2ZM6CS67S','reussi',NULL,'2026-10-17 15:00:00','2026-10-17 15:01:00');
+INSERT INTO "paiements" VALUES(185,22,'orange_money','696637601',2000,'PAYGFY4QD248','reussi',NULL,'2026-10-23 15:00:00','2026-10-23 15:01:00');
+INSERT INTO "paiements" VALUES(186,19,'orange_money','678398441',5000,'PAYCKH6MLPNJ','reussi',NULL,'2026-10-19 15:00:00','2026-10-19 15:01:00');
+INSERT INTO "paiements" VALUES(187,24,'orange_money','654041154',2000,'PAYEF23WT7A4','reussi',NULL,'2026-10-19 15:00:00','2026-10-19 15:01:00');
+INSERT INTO "paiements" VALUES(188,4,'mtn_momo','677000004',5000,'PAYGGGUY4S29','reussi',NULL,'2026-10-21 15:00:00','2026-10-21 15:01:00');
+INSERT INTO "paiements" VALUES(189,20,'mtn_momo','662684052',1000,'PAYK3C3XRD8T','reussi',NULL,'2026-10-21 15:00:00','2026-10-21 15:01:00');
+INSERT INTO "paiements" VALUES(190,18,'orange_money','668517485',2000,'PAY9GQJV6WT4','reussi',NULL,'2026-10-19 15:00:00','2026-10-19 15:01:00');
+INSERT INTO "paiements" VALUES(191,13,'orange_money','690054447',2000,'PAY49ZDLEV3J','reussi',NULL,'2026-10-16 15:00:00','2026-10-16 15:01:00');
+INSERT INTO "paiements" VALUES(192,6,'mtn_momo','662564217',2000,'PAYHBRZ96M8Y','reussi',NULL,'2026-10-16 15:00:00','2026-10-16 15:01:00');
+INSERT INTO "paiements" VALUES(193,24,'orange_money','654041154',5000,'PAY2DLPQQPT4','reussi',NULL,'2026-10-22 15:00:00','2026-10-22 15:01:00');
+INSERT INTO "paiements" VALUES(194,2,'mtn_momo','677000002',5000,'PAYJMAQSVT52','reussi',NULL,'2026-10-23 15:00:00','2026-10-23 15:01:00');
+INSERT INTO "paiements" VALUES(195,8,'orange_money','691525206',2000,'PAYV3GAZUVG8','reussi',NULL,'2026-10-19 15:00:00','2026-10-19 15:01:00');
+INSERT INTO "paiements" VALUES(196,20,'mtn_momo','662684052',5000,'PAYRD3WJB9US','reussi',NULL,'2026-10-19 15:00:00','2026-10-19 15:01:00');
+INSERT INTO "paiements" VALUES(197,23,'orange_money','674017343',5000,'PAYQ8YVLMUG8','reussi',NULL,'2026-10-20 15:00:00','2026-10-20 15:01:00');
+INSERT INTO "paiements" VALUES(198,26,'mtn_momo','677000004',10000,'PAYJ89H46CES','reussi',NULL,'2026-09-24 10:00:00','2026-09-24 10:01:00');
+INSERT INTO "paiements" VALUES(199,27,'orange_money','696073292',10000,'PAYAQXG5R8Y2','reussi',NULL,'2026-09-22 10:00:00','2026-09-22 10:01:00');
+INSERT INTO "paiements" VALUES(200,29,'orange_money','672710343',10000,'PAYDAL89LE9W','reussi',NULL,'2026-09-27 10:00:00','2026-09-27 10:01:00');
+INSERT INTO "paiements" VALUES(201,31,'mtn_momo','699790057',10000,'PAYXTDQ23RF7','reussi',NULL,'2026-09-22 10:00:00','2026-09-22 10:01:00');
+INSERT INTO "paiements" VALUES(202,32,'mtn_momo','692396987',10000,'PAY6F96WH9BG','reussi',NULL,'2026-09-22 10:00:00','2026-09-22 10:01:00');
+INSERT INTO "paiements" VALUES(203,33,'orange_money','651839607',10000,'PAY4CAFVP7XZ','reussi',NULL,'2026-09-27 10:00:00','2026-09-27 10:01:00');
+INSERT INTO "paiements" VALUES(204,34,'orange_money','655007072',10000,'PAYQ7X8Z6HGQ','reussi',NULL,'2026-09-22 10:00:00','2026-09-22 10:01:00');
+INSERT INTO "paiements" VALUES(205,35,'mtn_momo','651437026',10000,'PAYXYUZGCL9J','reussi',NULL,'2026-09-22 10:00:00','2026-09-22 10:01:00');
+INSERT INTO "paiements" VALUES(206,36,'mtn_momo','691161193',10000,'PAYGSNNH3P7N','reussi',NULL,'2026-09-24 10:00:00','2026-09-24 10:01:00');
+INSERT INTO "paiements" VALUES(207,26,'orange_money','677000004',10000,'PAYG4CH67J9A','reussi',NULL,'2026-09-29 10:00:00','2026-09-29 10:01:00');
+INSERT INTO "paiements" VALUES(208,28,'mtn_momo','662564217',10000,'PAY58MMJG2W2','reussi',NULL,'2026-09-28 10:00:00','2026-09-28 10:01:00');
+INSERT INTO "paiements" VALUES(209,29,'mtn_momo','672710343',10000,'PAYRT3XU6JJ4','reussi',NULL,'2026-09-28 10:00:00','2026-09-28 10:01:00');
+INSERT INTO "paiements" VALUES(210,31,'orange_money','699790057',10000,'PAYWPNPUYJMW','reussi',NULL,'2026-09-29 10:00:00','2026-09-29 10:01:00');
+INSERT INTO "paiements" VALUES(211,32,'orange_money','692396987',10000,'PAYY84U5AGB2','reussi',NULL,'2026-09-29 10:00:00','2026-09-29 10:01:00');
+INSERT INTO "paiements" VALUES(212,33,'mtn_momo','651839607',10000,'PAYDDNTLUSKD','reussi',NULL,'2026-09-27 10:00:00','2026-09-27 10:01:00');
+INSERT INTO "paiements" VALUES(213,34,'orange_money','655007072',10000,'PAYPCY6GQ2RU','reussi',NULL,'2026-09-26 10:00:00','2026-09-26 10:01:00');
+INSERT INTO "paiements" VALUES(214,35,'orange_money','651437026',10000,'PAY224WDASN6','reussi',NULL,'2026-09-29 10:00:00','2026-09-29 10:01:00');
+INSERT INTO "paiements" VALUES(215,37,'orange_money','662154051',10000,'PAYZNNU6MEMM','reussi',NULL,'2026-10-07 10:00:00','2026-10-07 10:01:00');
+INSERT INTO "paiements" VALUES(216,26,'mtn_momo','677000004',10000,'PAY2C5TSJLSA','reussi',NULL,'2026-10-06 10:00:00','2026-10-06 10:01:00');
+INSERT INTO "paiements" VALUES(217,27,'orange_money','696073292',10000,'PAY7KCKWDV9Y','reussi',NULL,'2026-10-06 10:00:00','2026-10-06 10:01:00');
+INSERT INTO "paiements" VALUES(218,28,'orange_money','662564217',10000,'PAYWQMEL43FY','reussi',NULL,'2026-10-06 10:00:00','2026-10-06 10:01:00');
+INSERT INTO "paiements" VALUES(219,29,'mtn_momo','672710343',10000,'PAYPXXZUP8AH','reussi',NULL,'2026-10-06 10:00:00','2026-10-06 10:01:00');
+INSERT INTO "paiements" VALUES(220,31,'mtn_momo','699790057',10000,'PAY6RRCW2H2S','reussi',NULL,'2026-10-06 10:00:00','2026-10-06 10:01:00');
+INSERT INTO "paiements" VALUES(221,32,'orange_money','692396987',10000,'PAYBZ69CUNWF','reussi',NULL,'2026-10-04 10:00:00','2026-10-04 10:01:00');
+INSERT INTO "paiements" VALUES(222,33,'orange_money','651839607',10000,'PAYLAEPP5GP5','reussi',NULL,'2026-10-06 10:00:00','2026-10-06 10:01:00');
+INSERT INTO "paiements" VALUES(223,36,'mtn_momo','691161193',10000,'PAYKB7XCFEDM','reussi',NULL,'2026-10-06 10:00:00','2026-10-06 10:01:00');
+INSERT INTO "paiements" VALUES(224,27,'orange_money','696073292',10000,'PAYEQS42635W','reussi',NULL,'2026-10-12 10:00:00','2026-10-12 10:01:00');
+INSERT INTO "paiements" VALUES(225,28,'mtn_momo','662564217',10000,'PAY2HAECEYGU','reussi',NULL,'2026-10-13 10:00:00','2026-10-13 10:01:00');
+INSERT INTO "paiements" VALUES(226,30,'orange_money','691525206',10000,'PAYFU623B8LQ','reussi',NULL,'2026-10-15 10:00:00','2026-10-15 10:01:00');
+INSERT INTO "paiements" VALUES(227,35,'orange_money','651437026',10000,'PAY3UKVZAKHC','reussi',NULL,'2026-10-11 10:00:00','2026-10-11 10:01:00');
+INSERT INTO "paiements" VALUES(228,26,'orange_money','677000004',10000,'PAY3FVPYP4KL','reussi',NULL,'2026-10-17 10:00:00','2026-10-17 10:01:00');
+INSERT INTO "paiements" VALUES(229,27,'orange_money','696073292',10000,'PAYQSNHMD7EU','reussi',NULL,'2026-10-20 10:00:00','2026-10-20 10:01:00');
+INSERT INTO "paiements" VALUES(230,28,'mtn_momo','662564217',10000,'PAYSGN9XYJRG','reussi',NULL,'2026-10-20 10:00:00','2026-10-20 10:01:00');
+INSERT INTO "paiements" VALUES(231,30,'mtn_momo','691525206',10000,'PAYENW96XVKZ','reussi',NULL,'2026-10-23 10:00:00','2026-10-23 10:01:00');
+INSERT INTO "paiements" VALUES(232,31,'orange_money','699790057',10000,'PAY5LAWRQ5TZ','reussi',NULL,'2026-10-23 10:00:00','2026-10-23 10:01:00');
+INSERT INTO "paiements" VALUES(233,33,'orange_money','651839607',10000,'PAYX876YV9GM','reussi',NULL,'2026-10-20 10:00:00','2026-10-20 10:01:00');
+INSERT INTO "paiements" VALUES(234,35,'orange_money','651437026',10000,'PAYTJNSEEBB3','reussi',NULL,'2026-10-20 10:00:00','2026-10-20 10:01:00');
+INSERT INTO "paiements" VALUES(235,36,'mtn_momo','691161193',10000,'PAYCS8KZ3QUJ','reussi',NULL,'2026-10-23 10:00:00','2026-10-23 10:01:00');
+INSERT INTO "paiements" VALUES(236,28,'orange_money','662564217',1000,'PAYSZQCPZ287','reussi',NULL,'2026-10-16 15:00:00','2026-10-16 15:01:00');
+INSERT INTO "paiements" VALUES(237,35,'orange_money','651437026',1000,'PAYTSM22ZES2','reussi',NULL,'2026-10-18 15:00:00','2026-10-18 15:01:00');
+INSERT INTO "paiements" VALUES(238,36,'mtn_momo','691161193',5000,'PAYY98AJ6LQE','reussi',NULL,'2026-10-17 15:00:00','2026-10-17 15:01:00');
+INSERT INTO "paiements" VALUES(239,37,'orange_money','662154051',1000,'PAYZHQ4XH888','reussi',NULL,'2026-10-21 15:00:00','2026-10-21 15:01:00');
+INSERT INTO "paiements" VALUES(240,34,'mtn_momo','655007072',2000,'PAYJLJCKDLSM','reussi',NULL,'2026-10-23 15:00:00','2026-10-23 15:01:00');
+INSERT INTO "paiements" VALUES(241,49,'mtn_momo','656089806',15000,'PAYC8ZW9T9MT','reussi',NULL,'2026-01-23 10:00:00','2026-01-23 10:01:00');
+INSERT INTO "paiements" VALUES(242,50,'mtn_momo','677000004',15000,'PAYQJD58CY3M','reussi',NULL,'2026-01-23 10:00:00','2026-01-23 10:01:00');
+INSERT INTO "paiements" VALUES(243,52,'mtn_momo','690054447',15000,'PAYH7WAAP2GW','reussi',NULL,'2026-01-23 10:00:00','2026-01-23 10:01:00');
+INSERT INTO "paiements" VALUES(244,54,'mtn_momo','692653446',15000,'PAYSMSRT8XZM','reussi',NULL,'2026-01-23 10:00:00','2026-01-23 10:01:00');
+INSERT INTO "paiements" VALUES(245,56,'orange_money','662320821',15000,'PAY5P4ZZ3T6M','reussi',NULL,'2026-01-25 10:00:00','2026-01-25 10:01:00');
+INSERT INTO "paiements" VALUES(246,51,'mtn_momo','675707197',15000,'PAYQGTR52NKK','reussi',NULL,'2026-02-23 10:00:00','2026-02-23 10:01:00');
+INSERT INTO "paiements" VALUES(247,53,'orange_money','679807725',15000,'PAYAM49JW9VS','reussi',NULL,'2026-02-25 10:00:00','2026-02-25 10:01:00');
+INSERT INTO "paiements" VALUES(248,54,'mtn_momo','692653446',15000,'PAY3GLDPS8G6','reussi',NULL,'2026-02-23 10:00:00','2026-02-23 10:01:00');
+INSERT INTO "paiements" VALUES(249,55,'orange_money','691065818',15000,'PAYSZZSYB4HY','reussi',NULL,'2026-02-23 10:00:00','2026-02-23 10:01:00');
+INSERT INTO "paiements" VALUES(250,56,'mtn_momo','662320821',15000,'PAYMUYW96F2U','reussi',NULL,'2026-02-20 10:00:00','2026-02-20 10:01:00');
+INSERT INTO "paiements" VALUES(251,50,'orange_money','677000004',15000,'PAYKLX43EFLX','reussi',NULL,'2026-03-25 10:00:00','2026-03-25 10:01:00');
+INSERT INTO "paiements" VALUES(252,52,'mtn_momo','690054447',15000,'PAYWWUT3T6Z6','reussi',NULL,'2026-03-28 10:00:00','2026-03-28 10:01:00');
+INSERT INTO "paiements" VALUES(253,53,'mtn_momo','679807725',15000,'PAYLMBJRSFPL','reussi',NULL,'2026-03-28 10:00:00','2026-03-28 10:01:00');
+INSERT INTO "paiements" VALUES(254,56,'mtn_momo','662320821',15000,'PAYGGE8DB3FG','reussi',NULL,'2026-03-22 10:00:00','2026-03-22 10:01:00');
+INSERT INTO "paiements" VALUES(255,49,'orange_money','656089806',15000,'PAYKF2VQRU6J','reussi',NULL,'2026-04-23 10:00:00','2026-04-23 10:01:00');
+INSERT INTO "paiements" VALUES(256,51,'orange_money','675707197',15000,'PAYLBCYW87T6','reussi',NULL,'2026-04-23 10:00:00','2026-04-23 10:01:00');
+INSERT INTO "paiements" VALUES(257,54,'mtn_momo','692653446',15000,'PAYM75VY8QF6','reussi',NULL,'2026-04-23 10:00:00','2026-04-23 10:01:00');
+INSERT INTO "paiements" VALUES(258,50,'mtn_momo','677000004',15000,'PAYZ4SKVAAJY','reussi',NULL,'2026-05-28 10:00:00','2026-05-28 10:01:00');
+INSERT INTO "paiements" VALUES(259,51,'orange_money','675707197',15000,'PAY8A98VA5UQ','reussi',NULL,'2026-05-21 10:00:00','2026-05-21 10:01:00');
+INSERT INTO "paiements" VALUES(260,53,'orange_money','679807725',15000,'PAYZN453RL22','reussi',NULL,'2026-05-20 10:00:00','2026-05-20 10:01:00');
+INSERT INTO "paiements" VALUES(261,54,'orange_money','692653446',15000,'PAYSF5RTUT4N','reussi',NULL,'2026-05-23 10:00:00','2026-05-23 10:01:00');
+INSERT INTO "paiements" VALUES(262,55,'mtn_momo','691065818',15000,'PAYMJUH76T9N','reussi',NULL,'2026-05-25 10:00:00','2026-05-25 10:01:00');
+INSERT INTO "paiements" VALUES(263,56,'mtn_momo','662320821',15000,'PAYBKDBMGUTJ','reussi',NULL,'2026-05-22 10:00:00','2026-05-22 10:01:00');
+INSERT INTO "paiements" VALUES(264,50,'mtn_momo','677000004',15000,'PAYAQFKA9PX4','reussi',NULL,'2026-06-20 10:00:00','2026-06-20 10:01:00');
+INSERT INTO "paiements" VALUES(265,52,'mtn_momo','690054447',15000,'PAY9Z7CXFKDT','reussi',NULL,'2026-06-25 10:00:00','2026-06-25 10:01:00');
+INSERT INTO "paiements" VALUES(266,53,'mtn_momo','679807725',15000,'PAYE8MNS2AHR','reussi',NULL,'2026-06-25 10:00:00','2026-06-25 10:01:00');
+INSERT INTO "paiements" VALUES(267,54,'mtn_momo','692653446',15000,'PAY6RCN7GP82','reussi',NULL,'2026-06-21 10:00:00','2026-06-21 10:01:00');
+INSERT INTO "paiements" VALUES(268,51,'orange_money','675707197',15000,'PAYWLCHS8VNZ','reussi',NULL,'2026-07-23 10:00:00','2026-07-23 10:01:00');
+INSERT INTO "paiements" VALUES(269,54,'mtn_momo','692653446',15000,'PAYPHR5WALTH','reussi',NULL,'2026-07-20 10:00:00','2026-07-20 10:01:00');
+INSERT INTO "paiements" VALUES(270,55,'mtn_momo','691065818',15000,'PAYRAC8KZFRL','reussi',NULL,'2026-07-21 10:00:00','2026-07-21 10:01:00');
+INSERT INTO "paiements" VALUES(271,56,'orange_money','662320821',15000,'PAYFXDDYKGJ9','reussi',NULL,'2026-07-20 10:00:00','2026-07-20 10:01:00');
+INSERT INTO "paiements" VALUES(272,49,'orange_money','656089806',15000,'PAYWY6NB2YJS','reussi',NULL,'2026-08-28 10:00:00','2026-08-28 10:01:00');
+INSERT INTO "paiements" VALUES(273,50,'mtn_momo','677000004',15000,'PAY96U9NMYW7','reussi',NULL,'2026-08-21 10:00:00','2026-08-21 10:01:00');
+INSERT INTO "paiements" VALUES(274,51,'mtn_momo','675707197',15000,'PAYLEK6USZ7A','reussi',NULL,'2026-08-22 10:00:00','2026-08-22 10:01:00');
+INSERT INTO "paiements" VALUES(275,54,'orange_money','692653446',15000,'PAYMBZRWE2N9','reussi',NULL,'2026-08-20 10:00:00','2026-08-20 10:01:00');
+INSERT INTO "paiements" VALUES(276,52,'orange_money','690054447',5000,'PAYGC29SDZQE','reussi',NULL,'2026-10-22 15:00:00','2026-10-22 15:01:00');
+INSERT INTO "paiements" VALUES(277,54,'orange_money','692653446',5000,'PAY4ZDTCEVEP','reussi',NULL,'2026-10-18 15:00:00','2026-10-18 15:01:00');
+CREATE TABLE penalites (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    adhesion_id INTEGER NOT NULL REFERENCES adhesions (id),
+    seance_id   INTEGER NOT NULL REFERENCES seances (id),
+    motif       TEXT    NOT NULL CHECK (motif IN ('retard', 'absence')),
+    montant     INTEGER NOT NULL CHECK (montant > 0),
+    payee       INTEGER NOT NULL DEFAULT 0 CHECK (payee IN (0, 1)),
+    paiement_id INTEGER REFERENCES paiements (id),
+    UNIQUE (adhesion_id, seance_id, motif)
+);
+INSERT INTO "penalites" VALUES(1,22,3,'retard',1000,0,NULL);
+INSERT INTO "penalites" VALUES(2,16,3,'retard',1000,0,NULL);
+INSERT INTO "penalites" VALUES(3,8,11,'absence',2000,1,NULL);
+INSERT INTO "penalites" VALUES(4,14,4,'absence',2000,1,NULL);
+INSERT INTO "penalites" VALUES(5,12,11,'retard',1000,0,NULL);
+INSERT INTO "penalites" VALUES(6,8,7,'retard',1000,1,NULL);
+INSERT INTO "penalites" VALUES(7,9,9,'absence',2000,1,NULL);
+INSERT INTO "penalites" VALUES(8,7,6,'absence',2000,0,NULL);
+INSERT INTO "penalites" VALUES(9,10,9,'absence',2000,0,NULL);
+INSERT INTO "penalites" VALUES(10,37,30,'retard',500,1,NULL);
+INSERT INTO "penalites" VALUES(11,37,26,'retard',500,0,NULL);
+INSERT INTO "penalites" VALUES(12,31,30,'retard',500,0,NULL);
+CREATE TABLE seances (
+    id                     INTEGER PRIMARY KEY AUTOINCREMENT,
+    cycle_id               INTEGER NOT NULL REFERENCES cycles (id),
+    numero                 INTEGER NOT NULL CHECK (numero > 0),
+    date                   TEXT    NOT NULL,
+    beneficiaire_id        INTEGER REFERENCES adhesions (id),
+    montant_total_collecte INTEGER NOT NULL DEFAULT 0 CHECK (montant_total_collecte >= 0),
+    UNIQUE (cycle_id, numero),
+    -- un membre ne bénéficie qu'une fois par cycle (plusieurs NULL sont permis)
+    UNIQUE (cycle_id, beneficiaire_id)
+);
+INSERT INTO "seances" VALUES(1,1,1,'2025-11-13',11,525000);
+INSERT INTO "seances" VALUES(2,1,2,'2025-12-13',4,575000);
+INSERT INTO "seances" VALUES(3,1,3,'2026-01-13',3,600000);
+INSERT INTO "seances" VALUES(4,1,4,'2026-02-13',13,625000);
+INSERT INTO "seances" VALUES(5,1,5,'2026-03-13',21,575000);
+INSERT INTO "seances" VALUES(6,1,6,'2026-04-13',17,600000);
+INSERT INTO "seances" VALUES(7,1,7,'2026-05-13',20,600000);
+INSERT INTO "seances" VALUES(8,1,8,'2026-06-13',8,625000);
+INSERT INTO "seances" VALUES(9,1,9,'2026-07-13',15,600000);
+INSERT INTO "seances" VALUES(10,1,10,'2026-08-13',24,575000);
+INSERT INTO "seances" VALUES(11,1,11,'2026-09-13',6,600000);
+INSERT INTO "seances" VALUES(12,1,12,'2026-10-13',1,575000);
+INSERT INTO "seances" VALUES(13,1,13,'2026-11-13',9,0);
+INSERT INTO "seances" VALUES(14,1,14,'2026-12-13',12,0);
+INSERT INTO "seances" VALUES(15,1,15,'2027-01-13',22,0);
+INSERT INTO "seances" VALUES(16,1,16,'2027-02-13',2,0);
+INSERT INTO "seances" VALUES(17,1,17,'2027-03-13',19,0);
+INSERT INTO "seances" VALUES(18,1,18,'2027-04-13',25,0);
+INSERT INTO "seances" VALUES(19,1,19,'2027-05-13',7,0);
+INSERT INTO "seances" VALUES(20,1,20,'2027-06-13',5,0);
+INSERT INTO "seances" VALUES(21,1,21,'2027-07-13',16,0);
+INSERT INTO "seances" VALUES(22,1,22,'2027-08-13',18,0);
+INSERT INTO "seances" VALUES(23,1,23,'2027-09-13',23,0);
+INSERT INTO "seances" VALUES(24,1,24,'2027-10-13',14,0);
+INSERT INTO "seances" VALUES(25,1,25,'2027-11-13',10,0);
+INSERT INTO "seances" VALUES(26,2,1,'2026-09-22',28,100000);
+INSERT INTO "seances" VALUES(27,2,2,'2026-09-29',32,110000);
+INSERT INTO "seances" VALUES(28,2,3,'2026-10-06',34,110000);
+INSERT INTO "seances" VALUES(29,2,4,'2026-10-13',31,110000);
+INSERT INTO "seances" VALUES(30,2,5,'2026-10-20',36,120000);
+INSERT INTO "seances" VALUES(31,2,6,'2026-10-27',26,0);
+INSERT INTO "seances" VALUES(32,2,7,'2026-11-03',29,0);
+INSERT INTO "seances" VALUES(33,2,8,'2026-11-10',27,0);
+INSERT INTO "seances" VALUES(34,2,9,'2026-11-17',33,0);
+INSERT INTO "seances" VALUES(35,2,10,'2026-11-24',37,0);
+INSERT INTO "seances" VALUES(36,2,11,'2026-12-01',35,0);
+INSERT INTO "seances" VALUES(37,2,12,'2026-12-08',30,0);
+INSERT INTO "seances" VALUES(38,3,1,'2026-01-23',52,120000);
+INSERT INTO "seances" VALUES(39,3,2,'2026-02-23',50,120000);
+INSERT INTO "seances" VALUES(40,3,3,'2026-03-23',49,120000);
+INSERT INTO "seances" VALUES(41,3,4,'2026-04-23',56,120000);
+INSERT INTO "seances" VALUES(42,3,5,'2026-05-23',55,120000);
+INSERT INTO "seances" VALUES(43,3,6,'2026-06-23',54,120000);
+INSERT INTO "seances" VALUES(44,3,7,'2026-07-23',53,120000);
+INSERT INTO "seances" VALUES(45,3,8,'2026-08-23',51,120000);
+CREATE TABLE tentatives_connexion (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    telephone        TEXT NOT NULL,
+    adresse_ip       TEXT NOT NULL,
+    date_tentative   TEXT NOT NULL
+);
+CREATE TABLE tontines (
+    id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom                   TEXT    NOT NULL CHECK (length(nom) BETWEEN 2 AND 80),
+    description           TEXT    NOT NULL DEFAULT '' CHECK (length(description) <= 300),
+    createur_id           INTEGER NOT NULL REFERENCES utilisateurs (id),
+    code_invitation       TEXT    NOT NULL UNIQUE CHECK (length(code_invitation) = 8),
+    adhesion_libre        INTEGER NOT NULL DEFAULT 0 CHECK (adhesion_libre IN (0, 1)),
+    publique              INTEGER NOT NULL DEFAULT 0 CHECK (publique IN (0, 1)),
+    nombre_max_membres    INTEGER NOT NULL CHECK (nombre_max_membres BETWEEN 2 AND 200),
+    statut                TEXT    NOT NULL DEFAULT 'active'
+                          CHECK (statut IN ('active', 'terminee', 'suspendue')),
+    suspension_plateforme INTEGER NOT NULL DEFAULT 0 CHECK (suspension_plateforme IN (0, 1)),
+    couleur               TEXT    NOT NULL DEFAULT 'vert'
+                          CHECK (couleur IN ('vert', 'or', 'turquoise', 'corail', 'prune')),
+    date_creation         TEXT    NOT NULL
+);
+INSERT INTO "tontines" VALUES(1,'Tontine des commerçants de Mboppi','Les commerçants du marché de Mboppi cotisent chaque mois.',1,'MBOP2026',0,0,25,'active',0,'vert','2025-10-24');
+INSERT INTO "tontines" VALUES(2,'Njangi des femmes de Bonabéri','Une cotisation chaque semaine entre voisines.',4,'BONA2026',0,0,12,'active',0,'or','2026-09-07');
+INSERT INTO "tontines" VALUES(3,'Jeunes entrepreneurs de Yaoundé','Un groupe de jeunes qui lance sa première tontine.',32,'JEUN2026',0,1,12,'active',0,'turquoise','2026-10-11');
+INSERT INTO "tontines" VALUES(4,'Anciens du lycée de Bali','Cycle terminé, les comptes sont archivés.',38,'LYCE2026',0,0,8,'terminee',0,'corail','2025-12-24');
+CREATE TABLE utilisateurs (
+    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom                  TEXT    NOT NULL CHECK (length(nom) BETWEEN 2 AND 80),
+    telephone            TEXT    NOT NULL UNIQUE CHECK (length(telephone) = 9),
+    code_acces           TEXT    NOT NULL,  -- empreinte, jamais le code en clair
+    date_inscription     TEXT    NOT NULL,
+    est_admin_plateforme INTEGER NOT NULL DEFAULT 0 CHECK (est_admin_plateforme IN (0, 1)),
+    actif                INTEGER NOT NULL DEFAULT 1 CHECK (actif IN (0, 1))
+);
+INSERT INTO "utilisateurs" VALUES(1,'Ibrahim Ngassa','677000001','scrypt:32768:8:1$VygJFwFzrTUd1No2$5d2cac2472dacab57debb14c1690900b41d216f2219c4a211eedbaf8f1a3262d72609ae47dc7895da952396ae2fb6f574325311a342156950d957eee78a8f5a6','2026-01-02',0,1);
+INSERT INTO "utilisateurs" VALUES(2,'Félicité Abega','677000002','scrypt:32768:8:1$VygJFwFzrTUd1No2$5d2cac2472dacab57debb14c1690900b41d216f2219c4a211eedbaf8f1a3262d72609ae47dc7895da952396ae2fb6f574325311a342156950d957eee78a8f5a6','2026-06-16',0,1);
+INSERT INTO "utilisateurs" VALUES(3,'Kevin Nana','699000003','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-07-23',0,1);
+INSERT INTO "utilisateurs" VALUES(4,'Estelle Abega','677000004','scrypt:32768:8:1$klWu17ufd9im8l0C$cdca7b3e8e272da83138e9ea29a739420eb8ff27499d0fbe923672a4cda20e82f080789b256b09c2abbd1fd70377cac1e68db5188cb9419b8ff860b2fd98c45e','2025-09-20',0,1);
+INSERT INTO "utilisateurs" VALUES(5,'Nadège Atangana','696073292','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-06-13',0,1);
+INSERT INTO "utilisateurs" VALUES(6,'Yves Tagne','662564217','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-03-16',0,1);
+INSERT INTO "utilisateurs" VALUES(7,'Armand Ngo Bassa','672710343','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-12-24',0,1);
+INSERT INTO "utilisateurs" VALUES(8,'Aline Etoundi','691525206','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-11-12',0,1);
+INSERT INTO "utilisateurs" VALUES(9,'Kevin Njoya','699790057','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-04-14',0,1);
+INSERT INTO "utilisateurs" VALUES(10,'Brigitte Atangana','655438436','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-01-17',0,1);
+INSERT INTO "utilisateurs" VALUES(11,'Odette Biloa','673567281','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-02-18',0,1);
+INSERT INTO "utilisateurs" VALUES(12,'Rose Tchoupo','690326765','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-04-11',0,1);
+INSERT INTO "utilisateurs" VALUES(13,'Rose Mvondo','690054447','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-01-17',0,1);
+INSERT INTO "utilisateurs" VALUES(14,'Carine Fotso','679807725','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-01-11',0,1);
+INSERT INTO "utilisateurs" VALUES(15,'Rodrigue Mbarga','692653446','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-04-27',0,1);
+INSERT INTO "utilisateurs" VALUES(16,'Valentin Etoundi','691065818','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-12-19',0,1);
+INSERT INTO "utilisateurs" VALUES(17,'Thierry Essomba','662320821','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-04-27',0,1);
+INSERT INTO "utilisateurs" VALUES(18,'Eric Atangana','668517485','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-07-04',0,1);
+INSERT INTO "utilisateurs" VALUES(19,'Thierry Bello','678398441','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-02-11',0,1);
+INSERT INTO "utilisateurs" VALUES(20,'Yves Mbarga','662684052','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-05-20',0,1);
+INSERT INTO "utilisateurs" VALUES(21,'Rose Ngo Bassa','669515702','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-05-17',0,1);
+INSERT INTO "utilisateurs" VALUES(22,'Landry Kamga','696637601','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-06-09',0,1);
+INSERT INTO "utilisateurs" VALUES(23,'Blaise Biloa','674017343','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-08-27',0,1);
+INSERT INTO "utilisateurs" VALUES(24,'Landry Tchoupo','654041154','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-06-17',0,1);
+INSERT INTO "utilisateurs" VALUES(25,'Paul Mbarga','672342608','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-06-30',0,1);
+INSERT INTO "utilisateurs" VALUES(26,'Marie Tchamba','692396987','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-05-03',0,1);
+INSERT INTO "utilisateurs" VALUES(27,'Eric Onana','651839607','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-06-30',0,1);
+INSERT INTO "utilisateurs" VALUES(28,'Marie Ngassa','655007072','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-05-16',0,1);
+INSERT INTO "utilisateurs" VALUES(29,'Valentin Bello','651437026','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-06-23',0,1);
+INSERT INTO "utilisateurs" VALUES(30,'Rodrigue Nkou','691161193','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-07-08',0,1);
+INSERT INTO "utilisateurs" VALUES(31,'Estelle Njoya','662154051','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-09-11',0,1);
+INSERT INTO "utilisateurs" VALUES(32,'Estelle Bello','669418194','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-05-05',0,1);
+INSERT INTO "utilisateurs" VALUES(33,'Mireille Ateba','654924115','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-12-13',0,1);
+INSERT INTO "utilisateurs" VALUES(34,'Rodrigue Mouelle','679281590','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-02-09',0,1);
+INSERT INTO "utilisateurs" VALUES(35,'Landry Atangana','698877065','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-02-11',0,1);
+INSERT INTO "utilisateurs" VALUES(36,'Moussa Tagne','696402509','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-02-21',0,1);
+INSERT INTO "utilisateurs" VALUES(37,'Clarisse Kenfack','651921859','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-05-22',0,1);
+INSERT INTO "utilisateurs" VALUES(38,'Josiane Ndzana','656089806','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2026-04-03',0,1);
+INSERT INTO "utilisateurs" VALUES(39,'Clarisse Ateba','675707197','scrypt:32768:8:1$v2C3tbWPqqdCjDhm$4980cac6798078f5c8296a09da0721306e1f57e1b2fca01857e9fb38938da6ec21745266d266544ecc4c7a7babd8ae748b36ce7a48065d3b0cd3fb4222807626','2025-06-18',0,1);
+INSERT INTO "utilisateurs" VALUES(40,'Landry Fotso','699000099','scrypt:32768:8:1$j5TQX3e559TgTr4j$719a3fb0d8b81e54071232e6de045b4783652f03b4073343a0773bbe3da16ee9719ea213a751815c6089810f1693fc6276d53ff7afa5f164869e03fb2318f6e7','2026-02-18',1,1);
+CREATE INDEX idx_adhesions_utilisateur ON adhesions (utilisateur_id);
+CREATE INDEX idx_cycles_tontine ON cycles (tontine_id);
+CREATE INDEX idx_cotisations_adhesion ON cotisations (adhesion_id);
+CREATE INDEX idx_seances_date ON seances (date);
+CREATE INDEX idx_notifications_utilisateur ON notifications (utilisateur_id, lue);
+CREATE INDEX idx_paiements_adhesion ON paiements (adhesion_id);
+CREATE INDEX idx_lignes_paiement ON lignes_paiement (paiement_id);
+CREATE INDEX idx_evenements_tontine ON evenements (tontine_id);
+CREATE INDEX idx_contributions_evenement ON contributions_evenement (evenement_id);
+DELETE FROM "sqlite_sequence";
+INSERT INTO "sqlite_sequence" VALUES('utilisateurs',40);
+INSERT INTO "sqlite_sequence" VALUES('tontines',4);
+INSERT INTO "sqlite_sequence" VALUES('adhesions',56);
+INSERT INTO "sqlite_sequence" VALUES('cycles',3);
+INSERT INTO "sqlite_sequence" VALUES('seances',45);
+INSERT INTO "sqlite_sequence" VALUES('cotisations',402);
+INSERT INTO "sqlite_sequence" VALUES('paiements',277);
+INSERT INTO "sqlite_sequence" VALUES('lignes_paiement',277);
+INSERT INTO "sqlite_sequence" VALUES('penalites',12);
+INSERT INTO "sqlite_sequence" VALUES('evenements',5);
+INSERT INTO "sqlite_sequence" VALUES('contributions_evenement',54);
+INSERT INTO "sqlite_sequence" VALUES('journal_actions',8);
+INSERT INTO "sqlite_sequence" VALUES('notifications',4);
+COMMIT;

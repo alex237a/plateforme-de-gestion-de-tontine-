@@ -1,0 +1,43 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Séances · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Séances et bénéficiaires</h1>
+{% if cycle is none %}
+<p class="lead">Aucun cycle n'existe pour le moment.</p>
+{% else %}
+<p class="lead">Cycle « {{ cycle.nom }} ». Un membre ne peut être bénéficiaire qu'une seule fois dans le cycle.</p>
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">N°</th><th scope="col">Date</th><th scope="col">Bénéficiaire</th><th scope="col">Collecté</th><th scope="col">État</th><th scope="col">Actions</th></tr></thead>
+    <tbody>
+    {% for s in seances %}
+      <tr>
+        <td>{{ s.numero }}</td><td>{{ s.date|date_fr }}</td>
+        <td>
+          {% if tontine_modifiable and cycle.statut != 'termine' and not (s.passee and s.beneficiaire_id) %}
+          <form class="form-ligne" method="post" action="{{ url_for('designer_beneficiaire', id_tontine=tontine.id, id_seance=s.id) }}">
+            <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+            <label class="sr-only" for="benef-{{ s.id }}">Bénéficiaire de la séance {{ s.numero }}</label>
+            <select id="benef-{{ s.id }}" name="beneficiaire_id">
+              <option value="">— aucun —</option>
+              {% for m in membres %}
+              <option value="{{ m.id }}"{% if m.id == s.beneficiaire_id %} selected{% endif %}{% if m.id in deja and m.id != s.beneficiaire_id %} disabled{% endif %}>{{ m.nom }}{% if m.id in deja and m.id != s.beneficiaire_id %} (déjà bénéficiaire){% endif %}</option>
+              {% endfor %}
+            </select>
+            <button class="btn petit" type="submit">Désigner</button>
+          </form>
+          {% else %}{{ s.beneficiaire_nom or 'Pas encore désigné' }}{% endif %}
+        </td>
+        <td>{{ s.collecte|fcfa }}</td>
+        <td>{% if s.etat == 'passee' %}<span class="badge vert">Passée</span>{% elif s.etat == 'prochaine' %}<span class="badge or plein">Prochaine</span>{% else %}<span class="badge or">À venir</span>{% endif %}</td>
+        <td class="actions-cellule">
+          <a href="{{ url_for('page_cotisations', id_tontine=tontine.id, id_seance=s.id) }}">Cotisations</a>
+          <a href="{{ url_for('exporter_seance', id_tontine=tontine.id, id_seance=s.id) }}">CSV</a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

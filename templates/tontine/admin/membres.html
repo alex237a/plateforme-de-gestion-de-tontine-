@@ -1,0 +1,63 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Gestion des membres · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Gestion des membres</h1>
+{% if president %}
+<article class="carte">
+  <h2 class="petit-titre">Code d'invitation</h2>
+  <p>Partagez ce code pour inviter des membres : <strong class="code-inv">{{ tontine.code_invitation }}</strong></p>
+  {% if tontine_modifiable %}
+  <form method="post" action="{{ url_for('regenerer_invitation', id_tontine=tontine.id) }}" data-confirmer="Créer un nouveau code ? L'ancien ne fonctionnera plus.">
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <button class="btn ghost petit" type="submit">Créer un nouveau code</button>
+  </form>
+  {% endif %}
+</article>
+{% endif %}
+<form class="recherche" method="get" action="{{ url_for('admin_membres', id_tontine=tontine.id) }}" role="search">
+  <label for="q">Rechercher un membre par nom</label>
+  <input id="q" name="q" type="search" value="{{ q }}" maxlength="60" placeholder="Nom du membre">
+  <button class="btn ghost petit" type="submit">Chercher</button>
+</form>
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Nom</th><th scope="col">Téléphone</th><th scope="col">Rôle</th><th scope="col">Statut</th><th scope="col">Depuis</th><th scope="col">Actions</th></tr></thead>
+    <tbody>
+    {% for m in membres %}
+      <tr>
+        <td>{{ m.nom }}</td><td>{{ m.telephone }}</td>
+        <td>
+          {% if president and m.statut == 'active' and tontine_modifiable %}
+          <form class="form-ligne" method="post" action="{{ url_for('changer_role', id_tontine=tontine.id, id_adhesion=m.id) }}">
+            <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+            <label class="sr-only" for="role-{{ m.id }}">Rôle de {{ m.nom }}</label>
+            <select id="role-{{ m.id }}" name="role">{% for cle, libelle in ROLES.items() %}<option value="{{ cle }}"{% if m.role == cle %} selected{% endif %}>{{ libelle }}</option>{% endfor %}</select>
+            <button class="btn petit ghost" type="submit">Changer</button>
+          </form>
+          {% else %}<span class="badge role-{{ m.role }}">{{ ROLES[m.role] }}</span>{% endif %}
+        </td>
+        <td><span class="badge {{ 'vert' if m.statut == 'active' else 'or' }}">{{ STATUTS_ADHESION[m.statut] }}</span></td>
+        <td>{{ m.date_adhesion|date_fr }}</td>
+        <td class="actions-cellule">
+          {% if tontine_modifiable %}
+          {% if m.statut == 'en_attente' %}
+          <form class="form-ligne" method="post" action="{{ url_for('valider_adhesion', id_tontine=tontine.id, id_adhesion=m.id) }}">
+            <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><button class="btn petit" type="submit">Valider</button></form>
+          <form class="form-ligne" method="post" action="{{ url_for('refuser_adhesion', id_tontine=tontine.id, id_adhesion=m.id) }}">
+            <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><button class="btn petit ghost" type="submit">Refuser</button></form>
+          {% elif president and m.id != adhesion.id and cycle_bloque %}
+          <span class="mut">Retrait possible à la fin du cycle</span>
+          {% elif president and m.id != adhesion.id %}
+          <form class="form-ligne" method="post" action="{{ url_for('retirer_membre', id_tontine=tontine.id, id_adhesion=m.id) }}" data-confirmer="Retirer {{ m.nom }} de la tontine ?">
+            <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><button class="btn petit danger" type="submit">Retirer</button></form>
+          {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">Aucun membre ne correspond.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

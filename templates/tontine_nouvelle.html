@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titre %}Créer une tontine · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap etroit">
+  <h1>Créer une tontine</h1>
+  <p class="lead">Vous en serez le président. Un code d'invitation sera créé pour inviter les membres.</p>
+  <form id="form-tontine" class="carte formulaire" method="post" action="{{ url_for('tontine_nouvelle') }}" novalidate>
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    {% include "_champs_tontine.html" %}
+    <button class="btn" type="submit">Créer la tontine</button>
+  </form>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/formulaires.js') }}" defer></script>{% endblock %}

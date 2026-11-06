@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% from "_motifs.html" import photo with context %}
+{% block classe_main %}accueil{% endblock %}
+{% block contenu %}
+<section class="hero" aria-labelledby="titre-hero">
+  <div class="wrap hero-grille">
+    <div>
+      <p class="etiquette">Tontines · Cameroun</p>
+      <h1 id="titre-hero">Toutes vos tontines, un seul endroit. Chaque tour est visible.</h1>
+      <p>Créez une tontine ou rejoignez celle de vos amis : Njangi+ garde le compte des cotisations, annonce qui reçoit la cagnotte et quand viendra votre tour. Fini les cahiers perdus et les disputes.</p>
+      <div class="acts">
+        {% if utilisateur %}
+        <a class="btn" href="{{ url_for('mes_tontines') }}">Mes tontines</a>
+        <a class="btn ghost" href="{{ url_for('tontine_nouvelle') }}">Créer une tontine</a>
+        {% else %}
+        <a class="btn" href="{{ url_for('inscription') }}">Inscription</a>
+        <a class="btn ghost" href="{{ url_for('connexion') }}">Connexion</a>
+        {% endif %}
+      </div>
+    </div>
+    <canvas id="cercle" aria-label="Animation : les membres d'une tontine cotisent dans la cagnotte, qui est ensuite remise au bénéficiaire du tour" role="img"></canvas>
+  </div>
+</section>
+
+<section class="chiffres" aria-label="La plateforme en chiffres">
+  <div class="wrap chiffres-grille">
+    <div class="rv"><strong data-to="{{ chiffres.tontines }}">0</strong><span>tontines</span></div>
+    <div class="rv"><strong data-to="{{ chiffres.membres }}">0</strong><span>membres inscrits</span></div>
+    <div class="rv"><strong data-to="{{ chiffres.seances }}">0</strong><span>séances tenues</span></div>
+    <div class="rv"><strong data-to="{{ chiffres.collecte }}" data-suf="&nbsp;FCFA">0</strong><span>cotisés au total</span></div>
+  </div>
+</section>
+
+<section id="etapes" class="bloc">
+  <div class="wrap">
+    <h2>De la première cotisation au dernier tour</h2>
+    <p class="lead">Quatre étapes, suivies par tout le groupe en temps réel.</p>
+    <div class="etapes" id="steps">
+      <div class="remplissage" id="fill"></div>
+      <div class="etape"><div class="num">1</div><h3>Créez ou rejoignez une tontine</h3><p>Chaque tontine a son code d'invitation, ses membres et son bureau : un président et un trésorier.</p></div>
+      <div class="etape"><div class="num">2</div><h3>L'ordre des tours est tiré au sort</h3><p>Le tirage se fait à l'écran : chacun voit son rang, personne ne peut le modifier en cachette.</p></div>
+      <div class="etape"><div class="num">3</div><h3>Chacun cotise à chaque séance</h3><p>Espèces ou mobile money, le trésorier note chaque paiement et les retards apparaissent aussitôt.</p></div>
+      <div class="etape"><div class="num">4</div><h3>Le bénéficiaire reçoit la cagnotte</h3><p>Chaque membre reçoit la cagnotte une seule fois par cycle. Tout est consultable sur la page transparence.</p></div>
+    </div>
+  </div>
+</section
+
+<section class="bloc sim" id="simulateur">
+  <div class="wrap">
+    <h2>Combien recevrez-vous à votre tour ?</h2>
+    <p class="lead">Réglez votre tontine et regardez la cagnotte tourner.</p>
+    <div class="sim-grille">
+      <div class="ctl">
+        <label for="nb">Nombre de membres <b id="nbv">10</b></label>
+        <input id="nb" type="range" min="3" max="40" value="10">
+        <label for="mt">Cotisation par tour <b id="mtv">25 000 FCFA</b></label>
+        <input id="mt" type="range" min="5000" max="200000" step="5000" value="25000">
+      </div>
+      <div class="pot">
+        <small>Cagnotte reçue à chaque tour</small>
+        <div class="big" id="pot">250 000 FCFA</div>
+        <small id="dur">Le cycle dure 10 mois</small>
+        <div class="dots" id="dots"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bloc" aria-labelledby="titre-equipe">
+  <div class="wrap bureau">
+    <div>
+      <h2 id="titre-equipe">Un bureau par tontine, des comptes ouverts à tous</h2>
+      <p class="lead">Dans chaque tontine, le trésorier enregistre l'argent et le président gère le groupe. Les membres consultent tout, personne ne modifie les comptes seul dans son coin.</p>
+      <ul class="liste-bureau">
+        <li><strong>Président</strong><span>gère le groupe et les cycles</span></li>
+        <li><strong>Trésorier</strong><span>enregistre cotisations et pénalités</span></li>
+        <li><strong>Membre</strong><span>consulte ses comptes et ceux du groupe</span></li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<section class="bloc cta">
+  <div class="wrap">
+    <h2>Votre prochaine tontine commence ici</h2>
+    <p class="lead">Un seul compte pour toutes vos tontines.</p>
+    <div class="acts acts-centre">
+      {% if utilisateur %}
+      <a class="btn" href="{{ url_for('tontine_nouvelle') }}">Créer une tontine</a>
+      <a class="btn ghost" href="{{ url_for('rejoindre') }}">Rejoindre une tontine</a>
+      {% else %}
+      <a class="btn" href="{{ url_for('inscription') }}">Créer mon compte</a>
+      <a class="btn ghost" href="{{ url_for('connexion') }}">J'ai déjà un compte</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/accueil.js') }}" defer></script>{% endblock %}

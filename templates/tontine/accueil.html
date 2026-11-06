@@ -1,0 +1,70 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}{{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>{{ tontine.nom }}</h1>
+{% if tontine.description %}<p class="lead">{{ tontine.description }}</p>{% endif %}
+{% if gestionnaire and nb_demandes %}
+<p class="bandeau-lecture">{{ nb_demandes }} demande{{ 's' if nb_demandes > 1 }} d'adhésion à traiter. <a class="lien" href="{{ url_for('admin_membres', id_tontine=tontine.id) }}">Voir les demandes</a></p>
+{% endif %}
+{% if cycle is none %}
+<p class="carte">Aucun cycle n'a encore commencé dans cette tontine. {% if president %}<a class="lien" href="{{ url_for('formulaire_cycle', id_tontine=tontine.id) }}">Créez le premier cycle.</a>{% else %}Le président doit en créer un.{% endif %}</p>
+{% else %}
+<div class="grille-cartes">
+  <article class="carte carte-anneau">
+    <h2 class="petit-titre">Cycle « {{ cycle.nom }} »</h2>
+    <div class="anneau grand" data-pct="{{ progression }}" role="img" aria-label="Progression du cycle : {{ progression }} %">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="piste" cx="60" cy="60" r="52"/><circle class="valeur" cx="60" cy="60" r="52"/></svg>
+      <span class="anneau-texte">{{ progression }} %</span>
+    </div>
+    <p class="mut">{{ nb_passees }} séance{{ 's' if nb_passees > 1 }} sur {{ seances|length }} · <span class="badge {{ 'vert' if cycle.statut == 'en_cours' else 'or' }}">{{ STATUTS_CYCLE[cycle.statut] }}</span></p>
+  </article>
+  <article class="carte">
+    <h2 class="petit-titre">Cagnotte à chaque séance</h2>
+    <p class="gros"><span data-to="{{ cagnotte }}" data-suf="&nbsp;FCFA">0</span></p>
+    <p class="mut">{{ nb_membres }} membre{{ 's' if nb_membres > 1 }} · {{ cycle.montant_cotisation|fcfa }} chacun, {{ PERIODICITES[cycle.periodicite]|lower }}.</p>
+  </article>
+  <article class="carte">
+    <h2 class="petit-titre">Prochaine séance</h2>
+    {% if prochaine %}
+    <p class="gros">{{ prochaine.date|date_fr }}</p>
+    <p class="mut">Séance n° {{ prochaine.numero }}. Bénéficiaire : <strong>{{ prochaine.beneficiaire_nom or 'pas encore désigné' }}</strong>.</p>
+    {% else %}<p class="mut">Plus de séance à venir dans ce cycle.</p>{% endif %}
+  </article>
+</div>
+
+{% if moi %}
+<article class="carte {% if moi.montant_du > 0 %}carte-alerte{% else %}carte-ok{% endif %}">
+  <h2 class="petit-titre">Ma situation</h2>
+  <p>Je dois <strong>{{ moi.montant_du|fcfa }}</strong>.
+    {% if mon_tour %}Mon tour : <strong>{{ mon_tour.date|date_fr }}</strong> (séance n° {{ mon_tour.numero }}).{% endif %}
+    <a class="lien" href="{{ url_for('mon_espace', id_tontine=tontine.id) }}">Voir le détail</a></p>
+  {% if moi.montant_du > 0 and tontine_modifiable and cycle.statut == 'en_cours' %}<p><a class="btn petit" href="{{ url_for('payer', id_tontine=tontine.id) }}">Payer par Orange Money ou MTN MoMo</a></p>{% endif %}
+</article>
+{% endif %}
+{% endif %}
+
+<article class="carte" aria-labelledby="titre-evenements">
+  <h2 class="petit-titre" id="titre-evenements">Événements ouverts aux contributions</h2>
+  {% if evenements %}
+  <ul class="liste-simple">
+    {% for e in evenements %}
+    <li><a class="lien" href="{{ url_for('page_evenement', id_tontine=tontine.id, id_evenement=e.id) }}">{{ e.titre }}</a>
+      <span class="badge or">{{ TYPES_EVENEMENT[e.type] }}</span> <span class="mut">{{ e.total|fcfa }} collectés</span></li>
+    {% endfor %}
+  </ul>
+  {% else %}<p class="mut">Aucun événement ouvert pour le moment.</p>{% endif %}
+  <p class="mut">Contribution libre : personne n'est obligé, chacun participe s'il le souhaite. <a class="lien" href="{{ url_for('evenements', id_tontine=tontine.id) }}">Voir tous les événements</a></p>
+</article>
+
+{% if president %}
+<p class="mut">Code d'invitation de la tontine : <strong class="code-inv">{{ tontine.code_invitation }}</strong></p>
+{% endif %}
+{% if tontine_modifiable and cycle and cycle.statut != 'termine' %}
+<p class="mut espace-haut">Vous ne pouvez pas quitter la tontine tant que le cycle n'est pas terminé.</p>
+{% elif tontine_modifiable %}
+<form class="espace-haut" method="post" action="{{ url_for('quitter_tontine', id_tontine=tontine.id) }}" data-confirmer="Quitter la tontine « {{ tontine.nom }} » ?">
+  <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+  <button class="btn ghost petit" type="submit">Quitter la tontine</button>
+</form>
+{% endif %}
+{% endblock %}

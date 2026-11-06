@@ -1,0 +1,55 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Régler mes sommes · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Régler mes sommes</h1>
+<p class="lead">Payez ce que vous devez par Orange Money ou MTN MoMo. Le paiement est une simulation : aucun argent réel n'est prélevé.</p>
+{% if cycle is none %}
+<p class="carte">Aucun cycle n'est en cours dans cette tontine : il n'y a rien à régler.</p>
+{% elif not cotisations and not penalites %}
+<p class="carte carte-ok">Vous êtes à jour : il n'y a rien à régler pour le moment.</p>
+<p><a class="btn ghost" href="{{ url_for('mes_paiements', id_tontine=tontine.id) }}">Voir mes paiements</a></p>
+{% else %}
+<form id="form-paiement" method="post" action="{{ url_for('payer', id_tontine=tontine.id) }}" novalidate>
+  <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+  <div class="deux-colonnes">
+    <section class="carte" aria-labelledby="titre-sommes">
+      <h2 class="petit-titre" id="titre-sommes">Sommes à régler</h2>
+      <ul class="liste-sommes">
+        {% for c in cotisations %}
+        <li>
+          <input type="checkbox" id="cot-{{ c.seance_id }}" name="cotisation" value="{{ c.seance_id }}" data-montant="{{ c.montant }}" checked>
+          <label for="cot-{{ c.seance_id }}">Cotisation de la séance n° {{ c.numero }} <span class="mut">({{ c.date|date_fr }})</span></label>
+          <strong>{{ c.montant|fcfa }}</strong>
+        </li>
+        {% endfor %}
+        {% for p in penalites %}
+        <li>
+          <input type="checkbox" id="pen-{{ p.penalite_id }}" name="penalite" value="{{ p.penalite_id }}" data-montant="{{ p.montant }}" checked>
+          <label for="pen-{{ p.penalite_id }}">Pénalité ({{ MOTIFS[p.motif]|lower }}) de la séance n° {{ p.numero }}</label>
+          <strong>{{ p.montant|fcfa }}</strong>
+        </li>
+        {% endfor %}
+      </ul>
+      <p class="total-paiement">Total à payer : <strong id="total-paiement">{{ total|fcfa }}</strong></p>
+    </section>
+    <section class="carte" aria-labelledby="titre-moyen">
+      <h2 class="petit-titre" id="titre-moyen">Moyen de paiement</h2>
+      <div class="choix-operateur">
+        <input class="cache" type="radio" id="op-orange" name="operateur" value="orange_money" checked>
+        <label class="operateur orange" for="op-orange">Orange Money</label>
+        <input class="cache" type="radio" id="op-mtn" name="operateur" value="mtn_momo">
+        <label class="operateur mtn" for="op-mtn">MTN MoMo</label>
+      </div>
+      <div class="champ espace-haut">
+        <label for="telephone">Numéro du compte de paiement</label>
+        <input id="telephone" name="telephone" type="tel" inputmode="numeric" value="{{ utilisateur.telephone }}" required>
+        <p class="erreur-champ" id="err-telephone" role="alert"></p>
+      </div>
+      <p class="erreur-champ" id="err-paiement" role="alert"></p>
+      <button class="btn" type="submit">Continuer</button>
+    </section>
+  </div>
+</form>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/payer.js') }}" defer></script>{% endblock %}

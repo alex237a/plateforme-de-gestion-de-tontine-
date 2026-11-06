@@ -1,0 +1,47 @@
+{# Petites illustrations décoratives en SVG, utilisées quand une photo est absente #}
+{% macro motif(nom) %}
+{% if nom == 'marche' %}
+<svg class="photo-motif" viewBox="0 0 120 90" aria-hidden="true">
+  <path d="M10 38 L60 10 L110 38 Z" fill="#e5483a" opacity=".85"/>
+  <path d="M10 38 Q22 52 35 38 Q47 52 60 38 Q72 52 85 38 Q97 52 110 38" fill="#f5b93a"/>
+  <rect x="18" y="52" width="84" height="8" rx="3" fill="#8a5a1c"/>
+  <circle cx="40" cy="70" r="9" fill="#2fd27f"/><circle cx="62" cy="70" r="9" fill="#f5b93a"/><circle cx="84" cy="70" r="9" fill="#e5483a"/>
+</svg>
+{% elif nom == 'reunion' %}
+<svg class="photo-motif" viewBox="0 0 120 90" aria-hidden="true">
+  <ellipse cx="60" cy="52" rx="38" ry="14" fill="#14402c" stroke="#2fd27f"/>
+  <circle cx="60" cy="52" r="7" fill="#f5b93a"/>
+  <circle cx="26" cy="38" r="9" fill="#2fd27f"/><circle cx="60" cy="24" r="9" fill="#f5b93a"/><circle cx="94" cy="38" r="9" fill="#2fd27f"/>
+  <circle cx="34" cy="72" r="9" fill="#f5b93a"/><circle cx="86" cy="72" r="9" fill="#2fd27f"/>
+</svg>
+{% elif nom == 'mobile' %}
+<svg class="photo-motif" viewBox="0 0 120 90" aria-hidden="true">
+  <rect x="42" y="8" width="36" height="74" rx="7" fill="#0b2119" stroke="#2fd27f" stroke-width="2"/>
+  <rect x="48" y="18" width="24" height="42" rx="3" fill="#14402c"/>
+  <circle cx="60" cy="39" r="8" fill="#f5b93a"/>
+  <circle cx="60" cy="71" r="3" fill="#8fae9e"/>
+  <path d="M86 30 q8 8 0 16 M92 24 q13 14 0 28" fill="none" stroke="#f5b93a" stroke-width="2" stroke-linecap="round"/>
+</svg>
+{% elif nom == 'commercante' %}
+<svg class="photo-motif" viewBox="0 0 120 90" aria-hidden="true">
+  <circle cx="60" cy="30" r="14" fill="#f5b93a"/>
+  <path d="M30 84 Q30 52 60 52 Q90 52 90 84 Z" fill="#2fd27f"/>
+  <rect x="46" y="62" width="28" height="16" rx="3" fill="#0b2119"/>
+  <text x="60" y="74" text-anchor="middle" font-size="9" font-weight="700" fill="#f5b93a">FCFA</text>
+</svg>
+{% else %}
+<svg class="photo-motif" viewBox="0 0 120 90" aria-hidden="true">
+  <circle cx="38" cy="40" r="12" fill="#2fd27f"/><circle cx="82" cy="40" r="12" fill="#f5b93a"/>
+  <path d="M14 84 Q14 58 38 58 Q62 58 62 84 Z" fill="#14402c" stroke="#2fd27f"/>
+  <path d="M58 84 Q58 58 82 58 Q106 58 106 84 Z" fill="#14402c" stroke="#f5b93a"/>
+</svg>
+{% endif %}
+{% endmacro %}
+
+{% macro photo(fichier, alt, legende, nom_motif, classe='') %}
+<figure class="photo {{ classe }}">
+  <img class="photo-img" src="{{ url_for('static', filename='images/' ~ fichier) }}" alt="{{ alt }}" width="640" height="420" loading="lazy">
+  {{ motif(nom_motif) }}
+  <figcaption>{{ legende }}</figcaption>
+</figure>
+{% endmacro %}

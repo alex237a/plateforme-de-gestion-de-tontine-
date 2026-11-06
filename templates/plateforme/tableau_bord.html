@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titre %}Plateforme · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap">
+  {% include "plateforme/_menu.html" %}
+  <h1>Administration de la plateforme</h1>
+  <p class="lead">Vue d'ensemble de toutes les tontines. Les cotisations sont en lecture seule.</p>
+  <div class="grille-kpi" id="plateforme" data-api="{{ url_for('api_plateforme_statistiques') }}">
+    <article class="carte kpi"><span class="mut">Tontines actives</span><strong data-to="{{ stats.tontines_actives }}">0</strong></article>
+    <article class="carte kpi"><span class="mut">Utilisateurs actifs</span><strong data-to="{{ stats.utilisateurs }}">0</strong></article>
+    <article class="carte kpi"><span class="mut">Adhésions actives</span><strong data-to="{{ stats.adhesions }}">0</strong></article>
+    <article class="carte kpi"><span class="mut">Total collecté</span><strong data-to="{{ stats.total_collecte }}" data-suf="&nbsp;FCFA">0</strong></article>
+  </div>
+  <article class="carte">
+    <h2 class="petit-titre">Les tontines les plus actives (total collecté)</h2>
+    <canvas id="graph-plateforme" class="graphique" role="img" aria-label="Graphique en barres : total collecté par tontine pour les cinq tontines les plus actives"></canvas>
+  </article>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/plateforme.js') }}" defer></script>{% endblock %}

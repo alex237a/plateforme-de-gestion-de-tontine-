@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titre %}Utilisateurs · Plateforme · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap">
+  {% include "plateforme/_menu.html" %}
+  <h1>Tous les utilisateurs</h1>
+  <form class="recherche" method="get" action="{{ url_for('plateforme_utilisateurs') }}" role="search">
+    <label for="q">Rechercher par nom ou téléphone</label>
+    <input id="q" name="q" type="search" value="{{ q }}" maxlength="60" placeholder="Nom ou numéro">
+    <button class="btn ghost petit" type="submit">Chercher</button>
+  </form>
+  <div class="tableau-defile">
+    <table>
+      <thead><tr><th scope="col">Nom</th><th scope="col">Téléphone</th><th scope="col">Inscrit le</th><th scope="col">Tontines</th><th scope="col">Statut</th><th scope="col">Action</th></tr></thead>
+      <tbody>
+      {% for u in utilisateurs %}
+        <tr>
+          <td>{{ u.nom }}{% if u.est_admin_plateforme %} <span class="badge or plein">Admin</span>{% endif %}</td><td>{{ u.telephone }}</td><td>{{ u.date_inscription|date_fr }}</td><td>{{ u.nb_tontines }}</td>
+          <td><span class="badge {{ 'vert' if u.actif else 'rouge' }}">{{ 'Actif' if u.actif else 'Suspendu' }}</span></td>
+          <td>
+            {% if not u.est_admin_plateforme %}
+            <form class="form-ligne" method="post" action="{{ url_for('plateforme_changer_compte', id_utilisateur=u.id, action='suspendre' if u.actif else 'reactiver') }}"{% if u.actif %} data-confirmer="Suspendre le compte de {{ u.nom }} ?"{% endif %}>
+              <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+              <button class="btn petit {{ 'danger' if u.actif else '' }}" type="submit">{{ 'Suspendre' if u.actif else 'Réactiver' }}</button></form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}<tr><td colspan="6">Aucun utilisateur ne correspond.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

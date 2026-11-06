@@ -1,0 +1,43 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Administration · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Tableau de bord</h1>
+{% if cycle is none %}
+<p class="lead">Aucun cycle n'existe. {% if president %}<a class="lien" href="{{ url_for('formulaire_cycle', id_tontine=tontine.id) }}">Créez le premier cycle.</a>{% endif %}</p>
+{% else %}
+<p class="lead">Cycle « {{ cycle.nom }} » · {{ cycle.montant_cotisation|fcfa }} par séance · <span class="badge {{ 'vert' if cycle.statut == 'en_cours' else 'or' }}">{{ STATUTS_CYCLE[cycle.statut] }}</span></p>
+{% if nb_demandes %}<p class="bandeau-lecture">{{ nb_demandes }} demande{{ 's' if nb_demandes > 1 }} d'adhésion à traiter. <a class="lien" href="{{ url_for('admin_membres', id_tontine=tontine.id) }}">Voir les demandes</a></p>{% endif %}
+
+<div class="grille-kpi" id="tableau" data-api="{{ url_for('api_statistiques', id_tontine=tontine.id, cycle=cycle.id) }}">
+  <article class="carte kpi"><span class="mut">Cagnotte attendue par séance</span><strong data-to="{{ attendu_seance }}" data-suf="&nbsp;FCFA">0</strong></article>
+  <article class="carte kpi"><span class="mut">Total collecté</span><strong data-to="{{ total_collecte }}" data-suf="&nbsp;FCFA">0</strong></article>
+  <article class="carte kpi alerte"><span class="mut">Membres en retard</span><strong data-to="{{ nb_retardataires }}">0</strong></article>
+  <article class="carte kpi"><span class="mut">Pénalités impayées</span><strong data-to="{{ penalites_impayees }}" data-suf="&nbsp;FCFA">0</strong></article>
+</div>
+
+{% if prochaine %}
+<p class="info-prochaine"><span class="point"></span> Prochaine séance : n° {{ prochaine.numero }}, le {{ prochaine.date|date_fr }}.
+  Bénéficiaire : <strong>{{ prochaine.beneficiaire_nom or 'pas encore désigné' }}</strong>.</p>
+{% endif %}
+<div class="actions-barre">
+  <a class="btn ghost petit" href="{{ url_for('exporter_membres', id_tontine=tontine.id, cycle=cycle.id) }}">Exporter la situation des membres (CSV)</a>
+  <a class="btn ghost petit" href="{{ url_for('historique', id_tontine=tontine.id, cycle=cycle.id) }}">Historique imprimable</a>
+</div>
+
+<article class="carte">
+  <h2 class="petit-titre">Montant collecté par séance, comparé au montant attendu</h2>
+  <canvas id="graph-collecte" class="graphique" role="img" aria-label="Graphique en barres : montant collecté et montant attendu pour chaque séance passée"></canvas>
+  <p class="legende"><span class="pastille vert"></span> Collecté <span class="pastille or"></span> Attendu</p>
+</article>
+<div class="deux-colonnes">
+  <article class="carte"><h2 class="petit-titre">Membres en retard et montant dû</h2><div class="tableau-defile" id="zone-retards"><p class="mut">Chargement…</p></div></article>
+  <article class="carte"><h2 class="petit-titre">Pénalités par membre</h2><div class="tableau-defile" id="zone-penalites"><p class="mut">Chargement…</p></div></article>
+</div>
+<article class="carte">
+  <h2 class="petit-titre">Taux de ponctualité de chaque membre</h2>
+  <p class="mut">Cotisations payées à temps (au plus tard le jour de la séance) sur le nombre de séances passées.</p>
+  <div id="zone-ponctualite" class="liste-ponctualite"><p class="mut">Chargement…</p></div>
+</article>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/tableau_bord.js') }}" defer></script>{% endblock %}

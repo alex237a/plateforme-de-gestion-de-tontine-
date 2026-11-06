@@ -1,0 +1,93 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}{{ evenement.titre }} · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>{{ evenement.titre }}</h1>
+<p class="lead"><span class="badge or">{{ TYPES_EVENEMENT[evenement.type] }}</span>
+  {% if evenement.accepte %}<span class="badge vert">Ouvert aux contributions</span>{% else %}<span class="badge rouge">Clos</span>{% endif %}
+  · {{ evenement.date_evenement|date_fr }}{% if evenement.concerne_nom %} · concerne {{ evenement.concerne_nom }}{% endif %}</p>
+{% if evenement.description %}<p>{{ evenement.description }}</p>{% endif %}
+
+<div class="deux-colonnes">
+  <section class="carte" id="etat-evenement" data-api="{{ url_for('api_etat_evenement', id_tontine=tontine.id, id_evenement=evenement.id) }}" aria-labelledby="titre-total">
+    <h2 class="petit-titre" id="titre-total">Contributions</h2>
+    <p class="gros" id="total-evenement">{{ evenement.total|fcfa }}</p>
+    <p class="mut">{% if evenement.objectif %}Objectif : {{ evenement.objectif|fcfa }} · {% endif %}<span id="nb-contributeurs">{{ evenement.nb_contributeurs }}</span> contributeur{{ 's' if evenement.nb_contributeurs > 1 }}
+      {% if evenement.date_limite %}· jusqu'au {{ evenement.date_limite|date_fr }}{% endif %}</p>
+    {% if evenement.pourcentage is not none %}
+    <div class="barre" id="barre-evenement" data-pct="{{ evenement.pourcentage }}" role="progressbar" aria-label="Objectif atteint" aria-valuenow="{{ evenement.pourcentage }}" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+    {% endif %}
+    {% if mon_total %}<p class="espace-haut">Ma participation : <strong>{{ mon_total|fcfa }}</strong>. Merci.</p>{% endif %}
+  </section>
+
+  {% if evenement.accepte and tontine_modifiable %}
+  <form id="form-contribution" class="carte formulaire" method="post" action="{{ url_for('contribuer_evenement', id_tontine=tontine.id, id_evenement=evenement.id) }}" novalidate>
+    <h2 class="petit-titre">Je contribue</h2>
+    <p class="mut">Contribution libre : personne n'est obligé, donnez ce que vous voulez si vous souhaitez participer. Paiement simulé : aucun argent réel n'est prélevé.</p>
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <div class="champ">
+      <label for="montant">Montant (FCFA)</label>
+      <input id="montant" name="montant" type="number" min="500" max="5000000" step="100" value="{{ evenement.montant_suggere or '' }}" required>
+      <div class="puces" role="group" aria-label="Montants rapides">
+        {% for m in (500, 1000, 2000, 5000, 10000) %}<button class="btn ghost petit" type="button" data-montant="{{ m }}">{{ m|fcfa }}</button>{% endfor %}
+      </div>
+      <p class="erreur-champ" id="err-montant" role="alert"></p>
+    </div>
+    <div class="choix-operateur">
+      <input class="cache" type="radio" id="op-orange" name="operateur" value="orange_money" checked>
+      <label class="operateur orange" for="op-orange">Orange Money</label>
+      <input class="cache" type="radio" id="op-mtn" name="operateur" value="mtn_momo">
+      <label class="operateur mtn" for="op-mtn">MTN MoMo</label>
+    </div>
+    <div class="champ espace-haut">
+      <label for="telephone">Numéro du compte de paiement</label>
+      <input id="telephone" name="telephone" type="tel" inputmode="numeric" value="{{ utilisateur.telephone }}" required>
+      <p class="erreur-champ" id="err-telephone" role="alert"></p>
+    </div>
+    <button class="btn" type="submit">Continuer</button>
+  </form>
+  {% elif not evenement.accepte %}
+  <section class="carte"><h2 class="petit-titre">Événement clos</h2><p class="mut">Cet événement n'accepte plus de contributions.</p></section>
+  {% endif %}
+</div>
+
+{% if gestionnaire and tontine_modifiable %}
+<div class="deux-colonnes">
+  {% if evenement.accepte %}
+  <form class="carte formulaire" method="post" action="{{ url_for('enregistrer_contribution', id_tontine=tontine.id, id_evenement=evenement.id) }}">
+    <h2 class="petit-titre">Noter une contribution en espèces</h2>
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <div class="champ"><label for="adhesion-especes">Membre</label>
+      <select id="adhesion-especes" name="adhesion_id" required>{% for m in membres %}<option value="{{ m.id }}">{{ m.nom }}</option>{% endfor %}</select></div>
+    <div class="champ"><label for="montant-especes">Montant (FCFA)</label>
+      <input id="montant-especes" name="montant" type="number" min="500" max="5000000" step="100" required></div>
+    <button class="btn" type="submit">Enregistrer</button>
+  </form>
+  {% endif %}
+  <form class="carte formulaire" method="post" action="{{ url_for('changer_statut_evenement', id_tontine=tontine.id, id_evenement=evenement.id) }}">
+    <h2 class="petit-titre">Statut de l'événement</h2>
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    {% if evenement.statut == 'ouvert' %}
+    <input type="hidden" name="action" value="clore"><p class="mut">Clore l'événement arrête les contributions.</p>
+    <button class="btn ghost" type="submit">Clore l'événement</button>
+    {% else %}
+    <input type="hidden" name="action" value="rouvrir"><button class="btn" type="submit">Rouvrir l'événement</button>
+    {% endif %}
+  </form>
+</div>
+{% endif %}
+
+<h2>Liste des contributions</h2>
+{% if contributions %}
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Membre</th><th scope="col">Montant</th><th scope="col">Date</th><th scope="col">Mode</th></tr></thead>
+    <tbody>
+    {% for c in contributions %}
+      <tr><td>{{ c.nom }}{% if c.la_mienne %} <span class="badge vert">Moi</span>{% endif %}</td><td>{{ c.montant|fcfa }}</td><td>{{ c.date_contribution|date_fr }}</td><td>{{ MODES[c.mode] }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}<p class="mut">Personne n'a encore contribué.</p>{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/evenement.js') }}" defer></script>{% endblock %}

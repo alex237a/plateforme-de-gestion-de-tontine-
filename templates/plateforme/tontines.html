@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titre %}Tontines · Plateforme · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap">
+  {% include "plateforme/_menu.html" %}
+  <h1>Toutes les tontines</h1>
+  <form class="recherche" method="get" action="{{ url_for('plateforme_tontines') }}" role="search">
+    <label for="q">Rechercher une tontine par nom</label>
+    <input id="q" name="q" type="search" value="{{ q }}" maxlength="60" placeholder="Nom de la tontine">
+    <button class="btn ghost petit" type="submit">Chercher</button>
+  </form>
+  <div class="tableau-defile">
+    <table>
+      <thead><tr><th scope="col">Tontine</th><th scope="col">Président</th><th scope="col">Membres</th><th scope="col">Total collecté</th><th scope="col">Statut</th><th scope="col">Action</th></tr></thead>
+      <tbody>
+      {% for t in tontines %}
+        <tr>
+          <td>{{ t.nom }}</td><td>{{ t.president or '—' }}</td><td>{{ t.nb_membres }}</td><td>{{ t.total|fcfa }}</td>
+          <td><span class="badge {{ 'vert' if t.statut == 'active' else 'rouge' }}">{{ STATUTS_TONTINE[t.statut] }}</span></td>
+          <td>
+            {% if t.statut == 'active' %}
+            <form class="form-ligne" method="post" action="{{ url_for('plateforme_suspendre_tontine', id_tontine=t.id) }}" data-confirmer="Suspendre la tontine « {{ t.nom }} » ?">
+              <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><button class="btn petit danger" type="submit">Suspendre</button></form>
+            {% elif t.statut == 'suspendue' %}
+            <form class="form-ligne" method="post" action="{{ url_for('plateforme_reactiver_tontine', id_tontine=t.id) }}">
+              <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><button class="btn petit" type="submit">Réactiver</button></form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}<tr><td colspan="6">Aucune tontine ne correspond.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

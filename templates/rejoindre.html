@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titre %}Rejoindre une tontine · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap">
+  <h1>Rejoindre une tontine</h1>
+  <form class="carte formulaire formulaire-code" method="post" action="{{ url_for('rejoindre_avec_code') }}">
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <div class="champ"><label for="code">Code d'invitation (8 caractères)</label>
+      <input id="code" name="code" type="text" maxlength="8" minlength="8" autocomplete="off" placeholder="EXEMPLE1" required></div>
+    <button class="btn" type="submit">Rejoindre</button>
+  </form>
+
+  <h2>Tontines ouvertes aux demandes</h2>
+  {% if ouvertes %}
+  <div class="grille-tontines">
+    {% for t in ouvertes %}
+    <article class="carte carte-tontine teinte-{{ t.couleur }}">
+      <h3 class="petit-titre">{{ t.nom }}</h3>
+      <p class="mut">{{ t.description or 'Pas de description.' }}</p>
+      <p>{{ t.nb_membres }} membre{{ 's' if t.nb_membres > 1 }} sur {{ t.nombre_max_membres }} ·
+        {% if t.adhesion_libre %}<span class="badge vert">Adhésion libre</span>{% else %}<span class="badge or">Sur validation</span>{% endif %}</p>
+      <form method="post" action="{{ url_for('demander_a_rejoindre', id_tontine=t.id) }}">
+        <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+        <button class="btn petit" type="submit">{{ 'Rejoindre' if t.adhesion_libre else 'Envoyer une demande' }}</button>
+      </form>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="mut">Aucune tontine de l'annuaire n'accepte de nouveaux membres pour le moment.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block titre %}Mes tontines · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap" id="mes-tontines" data-api="{{ url_for('api_mes_tontines') }}">
+  <h1>Mes tontines</h1>
+  <p class="lead">Bonjour {{ utilisateur.nom }}. Voici les tontines dont vous faites partie.</p>
+  <div class="grille-kpi grille-deux">
+    <article class="carte kpi"><span class="mut">Total que j'ai versé</span><strong id="total-verse">…</strong></article>
+    <article class="carte kpi alerte"><span class="mut">Total que je dois</span><strong id="total-du">…</strong></article>
+  </div>
+  <div class="actions-barre">
+    <a class="btn" href="{{ url_for('tontine_nouvelle') }}">Créer une tontine</a>
+    <a class="btn ghost" href="{{ url_for('rejoindre') }}">Rejoindre une tontine</a>
+  </div>
+
+  {% if resume %}
+  <div class="grille-tontines cascade">
+    {% for t in resume %}
+    <article class="carte carte-tontine teinte-{{ t.couleur }}">
+      <div class="entete-carte">
+        <div>
+          <h2 class="petit-titre"><a href="{{ url_for('tontine_accueil', id_tontine=t.id) }}">{{ t.nom }}</a></h2>
+          <span class="badge role-{{ t.role }}">{{ ROLES[t.role] }}</span>
+          {% if t.statut != 'active' %}<span class="badge rouge">{{ STATUTS_TONTINE[t.statut] }}</span>{% endif %}
+        </div>
+        <div class="anneau" data-pct="{{ t.progression }}" role="img" aria-label="Progression du cycle : {{ t.progression }} %">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="piste" cx="60" cy="60" r="52"/><circle class="valeur" cx="60" cy="60" r="52"/></svg>
+          <span class="anneau-texte">{{ t.progression }} %</span>
+        </div>
+      </div>
+      <dl class="infos">
+        <div><dt>Cycle</dt><dd>{{ t.cycle_nom or 'Aucun cycle' }}</dd></div>
+        <div><dt>Prochaine séance</dt><dd>{% if t.prochaine_date %}n° {{ t.prochaine_numero }} · {{ t.prochaine_date|date_fr }}{% else %}—{% endif %}</dd></div>
+        <div><dt>Mon tour</dt><dd>{{ t.tour_date|date_fr if t.tour_date else '—' }}</dd></div>
+        <div><dt>Je dois</dt><dd>{% if t.du > 0 %}<span class="badge rouge">{{ t.du|fcfa }}</span>{% else %}<span class="badge vert">À jour</span>{% endif %}</dd></div>
+      </dl>
+      <div class="form-ligne">
+        <a class="btn petit" href="{{ url_for('tontine_accueil', id_tontine=t.id) }}">Entrer</a>
+        {% if t.du > 0 and t.statut == 'active' %}<a class="btn petit ghost" href="{{ url_for('payer', id_tontine=t.id) }}">Payer</a>{% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="carte">Vous ne faites encore partie d'aucune tontine. Créez la vôtre, ou rejoignez-en une avec un code d'invitation.</p>
+  {% endif %}
+
+  {% if attentes %}
+  <h2>Demandes en attente</h2>
+  <ul class="liste-simple">
+    {% for a in attentes %}<li>{{ a.nom }} <span class="badge or">En attente de validation</span> <span class="mut">(demandée le {{ a.date_adhesion|date_fr }})</span></li>{% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/mes_tontines.js') }}" defer></script>{% endblock %}

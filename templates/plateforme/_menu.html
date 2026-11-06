@@ -1,0 +1,7 @@
+<nav class="menu-admin" aria-label="Administration de la plateforme">
+  <ul>
+    <li><a href="{{ url_for('plateforme_tableau_bord') }}"{% if request.endpoint == 'plateforme_tableau_bord' %} aria-current="page"{% endif %}>Tableau de bord</a></li>
+    <li><a href="{{ url_for('plateforme_tontines') }}"{% if request.endpoint == 'plateforme_tontines' %} aria-current="page"{% endif %}>Tontines</a></li>
+    <li><a href="{{ url_for('plateforme_utilisateurs') }}"{% if request.endpoint == 'plateforme_utilisateurs' %} aria-current="page"{% endif %}>Utilisateurs</a></li>
+  </ul>
+</nav>

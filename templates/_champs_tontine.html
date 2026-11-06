@@ -1,0 +1,19 @@
+<div class="champ"><label for="nom">Nom de la tontine</label>
+  <input id="nom" name="nom" type="text" maxlength="80" value="{{ valeurs.nom }}" required>
+  <p class="erreur-champ" id="err-nom" role="alert"></p></div>
+<div class="champ"><label for="description">Description (300 caractères au plus)</label>
+  <textarea id="description" name="description" rows="3" maxlength="300">{{ valeurs.description }}</textarea></div>
+<div class="champ"><label for="nombre_max_membres">Nombre maximal de membres</label>
+  <input id="nombre_max_membres" name="nombre_max_membres" type="number" min="2" max="200" value="{{ valeurs.nombre_max_membres }}" required>
+  <p class="erreur-champ" id="err-nombre_max_membres" role="alert"></p></div>
+<div class="champ"><label for="adhesion">Adhésion</label>
+  <select id="adhesion" name="adhesion">
+    <option value="validation"{% if valeurs.adhesion == 'validation' %} selected{% endif %}>Sur validation du bureau</option>
+    <option value="libre"{% if valeurs.adhesion == 'libre' %} selected{% endif %}>Libre avec le code d'invitation</option>
+  </select></div>
+<div class="champ"><label for="couleur">Couleur de la tontine</label>
+  <select id="couleur" name="couleur">
+    {% for cle, libelle in COULEURS.items() %}<option value="{{ cle }}"{% if valeurs.couleur == cle %} selected{% endif %}>{{ libelle }}</option>{% endfor %}
+  </select></div>
+<div class="champ case"><input id="publique" name="publique" type="checkbox" value="1"{% if valeurs.publique %} checked{% endif %}>
+  <label for="publique">Afficher cette tontine dans l'annuaire pour que d'autres puissent demander à la rejoindre</label></div>

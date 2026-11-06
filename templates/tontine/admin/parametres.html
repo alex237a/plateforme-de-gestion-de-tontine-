@@ -1,0 +1,34 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Paramètres · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Paramètres de la tontine</h1>
+<div class="deux-colonnes">
+  <form id="form-tontine" class="carte formulaire" method="post" action="{{ url_for('modifier_parametres', id_tontine=tontine.id) }}" novalidate>
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <fieldset{% if not tontine_modifiable %} disabled{% endif %}>
+      {% include "_champs_tontine.html" %}
+      <button class="btn" type="submit">Enregistrer</button>
+    </fieldset>
+  </form>
+  <div class="carte">
+    <h2 class="petit-titre">Statut de la tontine</h2>
+    <p>Statut actuel : <span class="badge {{ 'vert' if tontine.statut == 'active' else 'rouge' }}">{{ STATUTS_TONTINE[tontine.statut] }}</span></p>
+    {% if tontine.statut == 'active' %}
+    <p class="mut">Suspendre met la tontine en lecture seule, vous pourrez la réactiver. Clôturer est définitif et demande qu'aucun cycle ne soit ouvert.</p>
+    <form class="form-ligne" method="post" action="{{ url_for('changer_statut', id_tontine=tontine.id) }}" data-confirmer="Suspendre la tontine ?">
+      <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><input type="hidden" name="action" value="suspendre">
+      <button class="btn ghost" type="submit">Suspendre</button></form>
+    <form class="form-ligne espace-haut" method="post" action="{{ url_for('changer_statut', id_tontine=tontine.id) }}" data-confirmer="Clôturer définitivement la tontine ?">
+      <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><input type="hidden" name="action" value="cloturer">
+      <button class="btn danger" type="submit">Clôturer la tontine</button></form>
+    {% elif tontine.statut == 'suspendue' %}
+    {% if tontine.suspension_plateforme %}<p class="mut">Cette tontine a été suspendue par l'administrateur de la plateforme.</p>
+    {% else %}
+    <form class="form-ligne" method="post" action="{{ url_for('changer_statut', id_tontine=tontine.id) }}">
+      <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><input type="hidden" name="action" value="reactiver">
+      <button class="btn" type="submit">Réactiver la tontine</button></form>{% endif %}
+    {% else %}<p class="mut">La tontine est terminée : ses comptes sont archivés en lecture seule.</p>{% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/formulaires.js') }}" defer></script>{% endblock %}

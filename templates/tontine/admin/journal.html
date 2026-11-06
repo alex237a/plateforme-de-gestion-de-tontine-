@@ -1,0 +1,15 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Journal · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Journal des actions</h1>
+<p class="lead">Qui a enregistré quoi, et quand (300 dernières actions).</p>
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Date</th><th scope="col">Par</th><th scope="col">Action</th><th scope="col">Détail</th></tr></thead>
+    <tbody>
+    {% for l in lignes %}<tr><td>{{ l.date_action|horodatage }}</td><td>{{ l.nom }}</td><td>{{ l.action }}</td><td>{{ l.detail }}</td></tr>
+    {% else %}<tr><td colspan="4">Aucune action enregistrée.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

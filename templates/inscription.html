@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titre %}Inscription · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap etroit">
+  <h1>Créer mon compte</h1>
+  <p class="lead">Un seul compte, avec votre téléphone, pour toutes vos tontines.</p>
+  <form id="form-inscription" class="carte formulaire" method="post" action="{{ url_for('inscription') }}" novalidate>
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <div class="champ"><label for="nom">Nom complet</label>
+      <input id="nom" name="nom" type="text" maxlength="80" autocomplete="name" value="{{ valeurs.nom }}" required>
+      <p class="erreur-champ" id="err-nom" role="alert"></p></div>
+    <div class="champ"><label for="telephone">Téléphone (9 chiffres, commence par 6)</label>
+      <input id="telephone" name="telephone" type="tel" inputmode="numeric" autocomplete="username" placeholder="677123456" value="{{ valeurs.telephone }}" required>
+      <p class="erreur-champ" id="err-telephone" role="alert"></p></div>
+    <div class="champ"><label for="code">Code d'accès (6 caractères minimum)</label>
+      <input id="code" name="code" type="password" autocomplete="new-password" required>
+      <p class="erreur-champ" id="err-code" role="alert"></p></div>
+    <div class="champ"><label for="confirmation">Confirmez le code d'accès</label>
+      <input id="confirmation" name="confirmation" type="password" autocomplete="new-password" required>
+      <p class="erreur-champ" id="err-confirmation" role="alert"></p></div>
+    <button class="btn" type="submit">Créer mon compte</button>
+  </form>
+  <p class="mut">Vous avez déjà un compte ? <a class="lien" href="{{ url_for('connexion') }}">Connectez-vous</a>.</p>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/formulaires.js') }}" defer></script>{% endblock %}

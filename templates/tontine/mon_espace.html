@@ -1,0 +1,100 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Mon espace · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Mon espace</h1>
+{% if cycle is none %}
+<p class="lead">Aucun cycle n'a encore commencé dans cette tontine.</p>
+{% else %}
+<p class="lead">Cycle « {{ cycle.nom }} » : {{ cycle.montant_cotisation|fcfa }} à chaque séance, {{ PERIODICITES[cycle.periodicite]|lower }}.</p>
+<div class="grille-cartes">
+  <article class="carte {% if moi.montant_du > 0 %}carte-alerte{% else %}carte-ok{% endif %}">
+    <h2 class="petit-titre">Ce que je dois</h2>
+    <p class="gros">{{ moi.montant_du|fcfa }}</p>
+    {% if moi.montant_du > 0 %}
+    <p class="mut">{{ moi.manque|fcfa }} de cotisations ({{ moi.seances_manquantes }} séance{{ 's' if moi.seances_manquantes > 1 }}) et {{ moi.penalites_dues|fcfa }} de pénalités non payées.</p>
+    <span class="badge rouge">En retard</span>
+    {% if tontine_modifiable and cycle.statut == 'en_cours' %}<p class="espace-haut"><a class="btn petit" href="{{ url_for('payer', id_tontine=tontine.id) }}">Payer par Orange Money ou MTN MoMo</a></p>{% endif %}
+    {% else %}
+    <p class="mut">Vous êtes à jour de vos cotisations et de vos pénalités.</p>
+    <span class="badge vert">À jour</span>
+    {% endif %}
+  </article>
+  <article class="carte">
+    <h2 class="petit-titre">Ma date de bénéfice</h2>
+    {% if mon_tour %}
+    <p class="gros">{{ mon_tour.date|date_fr }}</p>
+    <p class="mut">Séance n° {{ mon_tour.numero }}, cagnotte attendue : {{ mon_tour.attendu|fcfa }}.</p>
+    {% if mon_tour.passee %}<span class="badge vert">Cagnotte reçue</span>{% else %}<span class="badge or">À venir</span>{% endif %}
+    {% else %}
+    <p class="gros">À fixer</p><p class="mut">Votre tour n'a pas encore été attribué dans ce cycle.</p>
+    {% endif %}
+  </article>
+  <article class="carte">
+    <h2 class="petit-titre">Ma progression</h2>
+    <p class="mut">Avancement du cycle : {{ nb_passees }} séance{{ 's' if nb_passees > 1 }} sur {{ seances|length }}</p>
+    <div class="barre" data-pct="{{ progression_cycle }}" role="progressbar" aria-label="Avancement du cycle" aria-valuenow="{{ progression_cycle }}" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+    <p class="mut espace-haut">Mes cotisations : {{ moi.nb_payees }} payée{{ 's' if moi.nb_payees > 1 }} sur {{ nb_passees }}</p>
+    <div class="barre or" data-pct="{{ progression_paiements }}" role="progressbar" aria-label="Cotisations payées" aria-valuenow="{{ progression_paiements }}" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+    <p class="mut espace-haut">Ponctualité : {{ (moi.taux ~ ' %') if moi.taux is not none else '—' }}</p>
+  </article>
+</div>
+
+<h2>Mes cotisations</h2>
+{% if cotisations %}
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Séance</th><th scope="col">Date de la séance</th><th scope="col">Montant</th><th scope="col">Payée le</th><th scope="col">Mode</th><th scope="col">Statut</th></tr></thead>
+    <tbody>
+    {% for c in cotisations %}
+      <tr><td>n° {{ c.numero }}</td><td>{{ c.date_seance|date_fr }}</td><td>{{ c.montant|fcfa }}</td><td>{{ c.date_paiement|date_fr }}</td><td>{{ MODES[c.mode] }}</td>
+        <td>{% if c.date_paiement <= c.date_seance %}<span class="badge vert">À temps</span>{% else %}<span class="badge or">Après la séance</span>{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}<p class="mut">Aucune cotisation enregistrée pour le moment.</p>{% endif %}
+
+{% set numeros_payes = cotisations|map(attribute='numero')|list %}
+{% set manquantes = seances|selectattr('passee')|rejectattr('numero', 'in', numeros_payes)|list %}
+{% if manquantes %}
+<h2>Séances non payées</h2>
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Séance</th><th scope="col">Date</th><th scope="col">Montant</th><th scope="col">Statut</th></tr></thead>
+    <tbody>
+    {% for s in manquantes %}<tr><td>n° {{ s.numero }}</td><td>{{ s.date|date_fr }}</td><td>{{ cycle.montant_cotisation|fcfa }}</td><td><span class="badge rouge">Non payée</span></td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<h2>Mes pénalités</h2>
+{% if penalites %}
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Séance</th><th scope="col">Motif</th><th scope="col">Montant</th><th scope="col">Statut</th></tr></thead>
+    <tbody>
+    {% for p in penalites %}
+      <tr><td>n° {{ p.numero }}</td><td>{{ MOTIFS[p.motif] }}</td><td>{{ p.montant|fcfa }}</td>
+        <td>{% if p.payee %}<span class="badge vert">Payée</span>{% else %}<span class="badge rouge">Non payée</span>{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}<p class="mut">Aucune pénalité : bravo.</p>{% endif %}
+{% endif %}
+
+<h2>Mes contributions aux événements</h2>
+{% if contributions %}
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Événement</th><th scope="col">Montant</th><th scope="col">Date</th><th scope="col">Mode</th></tr></thead>
+    <tbody>
+    {% for c in contributions %}
+      <tr><td><a href="{{ url_for('page_evenement', id_tontine=tontine.id, id_evenement=c.id_evenement) }}">{{ c.titre }}</a></td><td>{{ c.montant|fcfa }}</td><td>{{ c.date_contribution|date_fr }}</td><td>{{ MODES[c.mode] }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}<p class="mut">Vous n'avez contribué à aucun événement. Ces contributions sont libres : rien n'est obligatoire. <a class="lien" href="{{ url_for('evenements', id_tontine=tontine.id) }}">Voir les événements</a></p>{% endif %}
+{% endblock %}

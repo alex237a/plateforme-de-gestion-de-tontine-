@@ -1,0 +1,41 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Historique · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+{% if cycle is none %}
+<h1>Historique</h1><p class="lead">Aucun cycle n'existe pour le moment.</p>
+{% else %}
+<div class="actions-barre non-imprime">
+  <button class="btn" type="button" data-imprimer>Imprimer</button>
+  <a class="btn ghost" href="{{ url_for('exporter_membres', id_tontine=tontine.id, cycle=cycle.id) }}">Exporter la situation (CSV)</a>
+</div>
+<h1>{{ tontine.nom }} : historique du cycle « {{ cycle.nom }} »</h1>
+<p class="lead">Assemblée générale · document établi le {{ aujourdhui|date_fr }} · cotisation de {{ cycle.montant_cotisation|fcfa }} par séance, {{ PERIODICITES[cycle.periodicite]|lower }}.</p>
+<h2>Séances</h2>
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">N°</th><th scope="col">Date</th><th scope="col">Bénéficiaire</th><th scope="col">Collecté</th><th scope="col">Attendu</th><th scope="col">Écart</th></tr></thead>
+    <tbody>
+    {% for s in seances %}
+      <tr><td>{{ s.numero }}</td><td>{{ s.date|date_fr }}</td><td>{{ s.beneficiaire_nom or '—' }}</td>
+        {% if s.passee %}<td>{{ s.collecte|fcfa }}</td><td>{{ s.attendu|fcfa }}</td><td>{{ (s.collecte - s.attendu)|fcfa }}</td>{% else %}<td colspan="3">Séance à venir</td>{% endif %}</tr>
+    {% endfor %}
+    </tbody>
+    <tfoot><tr><th scope="row" colspan="3">Total des séances passées</th><td>{{ total|fcfa }}</td><td>{{ attendu|fcfa }}</td><td>{{ (total - attendu)|fcfa }}</td></tr></tfoot>
+  </table>
+</div>
+<h2>Situation des membres</h2>
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Membre</th><th scope="col">Cotisations payées</th><th scope="col">Total payé</th><th scope="col">Cotisations dues</th><th scope="col">Pénalités dues</th><th scope="col">Montant dû</th><th scope="col">Ponctualité</th></tr></thead>
+    <tbody>
+    {% for m in situation %}
+      <tr><td>{{ m.nom }}</td><td>{{ m.nb_payees }} sur {{ m.nb_passees }}</td><td>{{ m.paye|fcfa }}</td><td>{{ m.manque|fcfa }}</td><td>{{ m.penalites_dues|fcfa }}</td>
+        <td>{% if m.montant_du > 0 %}<span class="badge rouge">{{ m.montant_du|fcfa }}</span>{% else %}<span class="badge vert">À jour</span>{% endif %}</td>
+        <td>{{ (m.taux ~ ' %') if m.taux is not none else '—' }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="signatures"><div><p>Le trésorier</p></div><div><p>Le président</p></div></div>
+{% endif %}
+{% endblock %}

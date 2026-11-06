@@ -1,0 +1,20 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Nouveau cycle · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Créer un cycle</h1>
+{% if ouvert %}<p class="bandeau-lecture">Le cycle « {{ ouvert.nom }} » est encore ouvert : terminez-le avant d'en créer un autre.</p>{% endif %}
+<p class="lead">Le cycle aura {{ nb_membres }} séances, une par membre actif. L'ordre des bénéficiaires se tire au sort ensuite.</p>
+<form id="form-cycle" class="carte formulaire etroit" method="post" action="{{ url_for('creer_cycle', id_tontine=tontine.id) }}">
+  <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+  <fieldset{% if not tontine_modifiable or ouvert %} disabled{% endif %}>
+    <div class="champ"><label for="nom">Nom du cycle</label><input id="nom" name="nom" type="text" maxlength="80" value="{{ valeurs.nom }}" required></div>
+    <div class="champ"><label for="montant">Cotisation par séance (FCFA)</label><input id="montant" name="montant" type="number" min="1000" max="5000000" step="500" value="{{ valeurs.montant }}" required></div>
+    <div class="champ"><label for="periodicite">Périodicité</label>
+      <select id="periodicite" name="periodicite">{% for cle, libelle in PERIODICITES.items() %}<option value="{{ cle }}"{% if valeurs.periodicite == cle %} selected{% endif %}>{{ libelle }}</option>{% endfor %}</select></div>
+    <div class="champ"><label for="date_debut">Date de la première séance</label><input id="date_debut" name="date_debut" type="date" value="{{ valeurs.date_debut }}" required></div>
+    <div class="champ"><label for="penalite_retard">Pénalité de retard (FCFA)</label><input id="penalite_retard" name="penalite_retard" type="number" min="0" max="100000" step="100" value="{{ valeurs.penalite_retard }}" required></div>
+    <div class="champ"><label for="penalite_absence">Pénalité d'absence (FCFA)</label><input id="penalite_absence" name="penalite_absence" type="number" min="0" max="100000" step="100" value="{{ valeurs.penalite_absence }}" required></div>
+    <button class="btn" type="submit">Créer le cycle et ses séances</button>
+  </fieldset>
+</form>
+{% endblock %}

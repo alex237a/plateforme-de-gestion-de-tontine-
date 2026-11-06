@@ -1,0 +1,34 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Cycles · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Cycles</h1>
+<div class="actions-barre">{% if president and tontine_modifiable %}<a class="btn petit" href="{{ url_for('formulaire_cycle', id_tontine=tontine.id) }}">Créer un cycle</a>{% endif %}</div>
+{% if cycles %}
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Cycle</th><th scope="col">Cotisation</th><th scope="col">Périodicité</th><th scope="col">Début</th><th scope="col">Séances</th><th scope="col">Bénéficiaires</th><th scope="col">Statut</th><th scope="col">Actions</th></tr></thead>
+    <tbody>
+    {% for c in cycles %}
+      <tr>
+        <td>{{ c.nom }}</td><td>{{ c.montant_cotisation|fcfa }}</td><td>{{ PERIODICITES[c.periodicite] }}</td><td>{{ c.date_debut|date_fr }}</td>
+        <td>{{ c.nb_passees }} / {{ c.nb_seances }}</td><td>{{ c.nb_designes }} sur {{ c.nb_seances }}</td>
+        <td><span class="badge {{ 'vert' if c.statut == 'en_cours' else 'or' if c.statut == 'en_preparation' else '' }}">{{ STATUTS_CYCLE[c.statut] }}</span></td>
+        <td class="actions-cellule">
+          <a href="{{ url_for('page_tirage', id_tontine=tontine.id, id_cycle=c.id) }}">Tirage</a>
+          <a href="{{ url_for('liste_seances', id_tontine=tontine.id, cycle=c.id) }}">Séances</a>
+          <a href="{{ url_for('historique', id_tontine=tontine.id, cycle=c.id) }}">Historique</a>
+          {% if president and tontine_modifiable and c.statut == 'en_preparation' %}
+          <form class="form-ligne" method="post" action="{{ url_for('demarrer_cycle', id_tontine=tontine.id, id_cycle=c.id) }}">
+            <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><button class="btn petit" type="submit">Démarrer</button></form>
+          {% elif president and tontine_modifiable and c.statut == 'en_cours' %}
+          <form class="form-ligne" method="post" action="{{ url_for('terminer_cycle', id_tontine=tontine.id, id_cycle=c.id) }}" data-confirmer="Terminer le cycle « {{ c.nom }} » ?">
+            <input type="hidden" name="csrf" value="{{ jeton_csrf() }}"><button class="btn petit ghost" type="submit">Terminer</button></form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}<p class="mut">Aucun cycle pour le moment.</p>{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Calendrier · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Calendrier des séances</h1>
+{% if cycle is none %}
+<p class="lead">Aucun cycle n'a encore commencé dans cette tontine.</p>
+{% else %}
+<p class="lead">Cycle « {{ cycle.nom }} » : une séance par membre, un seul bénéficiaire par séance.</p>
+<div class="grille-seances cascade">
+  {% for s in seances %}
+  <article class="carte seance {{ s.etat }}{% if s.beneficiaire_id == adhesion.id %} moi{% endif %}">
+    <div class="seance-tete">
+      <span class="numero-seance">n° {{ s.numero }}</span>
+      {% if s.etat == 'passee' %}<span class="badge vert">Passée</span>
+      {% elif s.etat == 'prochaine' %}<span class="badge or plein">Prochaine</span>
+      {% else %}<span class="badge or">À venir</span>{% endif %}
+    </div>
+    <p class="date-seance">{{ s.date|date_fr }}</p>
+    <p class="mut">Bénéficiaire</p>
+    <p class="beneficiaire">{% if s.beneficiaire_nom %}{{ s.beneficiaire_nom }}{% else %}Pas encore désigné{% endif %}
+      {% if s.beneficiaire_id == adhesion.id %}<span class="badge vert">C'est moi</span>{% endif %}</p>
+  </article>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

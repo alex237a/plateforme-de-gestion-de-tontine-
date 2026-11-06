@@ -1,0 +1,36 @@
+{% set ep = request.endpoint %}
+<div class="entete-tontine">
+  <p class="fil"><a href="{{ url_for('mes_tontines') }}">Mes tontines</a> <span aria-hidden="true">/</span>
+    <strong>{{ tontine.nom }}</strong>
+    <span class="badge role-{{ adhesion.role }}">{{ ROLES[adhesion.role] }}</span>
+    {% if tontine.statut != 'active' %}<span class="badge rouge">{{ STATUTS_TONTINE[tontine.statut] }}</span>{% endif %}</p>
+  <nav class="menu-tontine" aria-label="Espace de la tontine">
+    <ul>
+      <li><a href="{{ url_for('tontine_accueil', id_tontine=tontine.id) }}"{% if ep == 'tontine_accueil' %} aria-current="page"{% endif %}>Vue d'ensemble</a></li>
+      <li><a href="{{ url_for('mon_espace', id_tontine=tontine.id) }}"{% if ep == 'mon_espace' %} aria-current="page"{% endif %}>Mon espace</a></li>
+      <li><a href="{{ url_for('payer', id_tontine=tontine.id) }}"{% if ep in ('payer', 'page_paiement', 'mes_paiements') %} aria-current="page"{% endif %}>Payer</a></li>
+      <li><a href="{{ url_for('evenements', id_tontine=tontine.id) }}"{% if ep in ('evenements', 'page_evenement', 'formulaire_evenement') %} aria-current="page"{% endif %}>Événements</a></li>
+      <li><a href="{{ url_for('calendrier', id_tontine=tontine.id) }}"{% if ep == 'calendrier' %} aria-current="page"{% endif %}>Calendrier</a></li>
+      <li><a href="{{ url_for('transparence', id_tontine=tontine.id) }}"{% if ep == 'transparence' %} aria-current="page"{% endif %}>Transparence</a></li>
+      <li><a href="{{ url_for('tontine_membres', id_tontine=tontine.id) }}"{% if ep == 'tontine_membres' %} aria-current="page"{% endif %}>Membres</a></li>
+      {% if gestionnaire %}<li><a href="{{ url_for('tontine_admin', id_tontine=tontine.id) }}"{% if request.path.startswith('/tontines/' ~ tontine.id ~ '/admin') %} aria-current="page"{% endif %}>Administration</a></li>{% endif %}
+    </ul>
+  </nav>
+</div>
+{% if not tontine_modifiable %}<p class="bandeau-lecture">Cette tontine est {{ STATUTS_TONTINE[tontine.statut]|lower }} : elle est en lecture seule.</p>{% endif %}
+{% if gestionnaire and request.path.startswith('/tontines/' ~ tontine.id ~ '/admin') %}
+<nav class="menu-admin" aria-label="Administration de la tontine">
+  <ul>
+    <li><a href="{{ url_for('tontine_admin', id_tontine=tontine.id) }}"{% if ep == 'tontine_admin' %} aria-current="page"{% endif %}>Tableau de bord</a></li>
+    <li><a href="{{ url_for('liste_seances', id_tontine=tontine.id) }}"{% if ep in ('liste_seances', 'page_cotisations') %} aria-current="page"{% endif %}>Séances</a></li>
+    <li><a href="{{ url_for('liste_penalites', id_tontine=tontine.id) }}"{% if ep == 'liste_penalites' %} aria-current="page"{% endif %}>Pénalités</a></li>
+    <li><a href="{{ url_for('admin_membres', id_tontine=tontine.id) }}"{% if ep == 'admin_membres' %} aria-current="page"{% endif %}>Membres</a></li>
+    <li><a href="{{ url_for('admin_paiements', id_tontine=tontine.id) }}"{% if ep == 'admin_paiements' %} aria-current="page"{% endif %}>Paiements</a></li>
+    <li><a href="{{ url_for('liste_cycles', id_tontine=tontine.id) }}"{% if ep in ('liste_cycles', 'formulaire_cycle', 'page_tirage') %} aria-current="page"{% endif %}>Cycles</a></li>
+    <li><a href="{{ url_for('journal', id_tontine=tontine.id) }}"{% if ep == 'journal' %} aria-current="page"{% endif %}>Journal</a></li>
+    <li><a href="{{ url_for('historique', id_tontine=tontine.id) }}"{% if ep == 'historique' %} aria-current="page"{% endif %}>Historique</a></li>
+    {% if president %}<li><a href="{{ url_for('page_parametres', id_tontine=tontine.id) }}"{% if ep == 'page_parametres' %} aria-current="page"{% endif %}>Paramètres</a></li>{% endif %}
+  </ul>
+</nav>
+{% if adhesion.role == 'tresorier' %}<p class="bandeau-lecture">Vous êtes trésorier : la gestion des cycles, des rôles et des paramètres est réservée au président.</p>{% endif %}
+{% endif %}

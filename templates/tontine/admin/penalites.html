@@ -1,0 +1,57 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Pénalités · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Pénalités</h1>
+{% if cycle is none %}
+<p class="lead">Aucun cycle n'existe pour le moment.</p>
+{% else %}
+<p class="lead">Cycle « {{ cycle.nom }} ». Retard : {{ cycle.montant_penalite_retard|fcfa }} · Absence : {{ cycle.montant_penalite_absence|fcfa }}.</p>
+{% if tontine_modifiable %}
+<div class="deux-colonnes">
+  <form class="carte formulaire" method="post" action="{{ url_for('ajouter_penalite', id_tontine=tontine.id) }}">
+    <h2 class="petit-titre">Enregistrer une pénalité</h2>
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <div class="champ"><label for="pen-membre">Membre</label>
+      <select id="pen-membre" name="adhesion_id" required>{% for m in membres %}<option value="{{ m.id }}">{{ m.nom }}</option>{% endfor %}</select></div>
+    <div class="champ"><label for="pen-seance">Séance</label>
+      <select id="pen-seance" name="seance_id" required>{% for s in seances|reverse %}<option value="{{ s.id }}">n° {{ s.numero }} · {{ s.date|date_fr }}</option>{% endfor %}</select></div>
+    <div class="champ"><label for="pen-motif">Motif</label>
+      <select id="pen-motif" name="motif" required>
+        <option value="retard">Retard ({{ cycle.montant_penalite_retard|fcfa }})</option>
+        <option value="absence">Absence ({{ cycle.montant_penalite_absence|fcfa }})</option>
+      </select></div>
+    <button class="btn" type="submit">Enregistrer</button>
+  </form>
+  <form class="carte formulaire" method="post" action="{{ url_for('modifier_montants_penalites', id_tontine=tontine.id) }}">
+    <h2 class="petit-titre">Montants des pénalités du cycle en cours</h2>
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <div class="champ"><label for="montant-retard">Retard (FCFA)</label>
+      <input id="montant-retard" name="retard" type="number" min="0" max="100000" step="100" value="{{ cycle.montant_penalite_retard }}" required></div>
+    <div class="champ"><label for="montant-absence">Absence (FCFA)</label>
+      <input id="montant-absence" name="absence" type="number" min="0" max="100000" step="100" value="{{ cycle.montant_penalite_absence }}" required></div>
+    <button class="btn ghost" type="submit">Mettre à jour</button>
+  </form>
+</div>
+{% endif %}
+<h2>Pénalités du cycle</h2>
+{% if penalites %}
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Membre</th><th scope="col">Séance</th><th scope="col">Motif</th><th scope="col">Montant</th><th scope="col">Statut</th>{% if tontine_modifiable %}<th scope="col">Action</th>{% endif %}</tr></thead>
+    <tbody>
+    {% for p in penalites %}
+      <tr><td>{{ p.nom }}</td><td>n° {{ p.numero }}</td><td>{{ MOTIFS[p.motif] }}</td><td>{{ p.montant|fcfa }}</td>
+        <td>{% if p.payee %}<span class="badge vert">Payée</span>{% else %}<span class="badge rouge">Non payée</span>{% endif %}</td>
+        {% if tontine_modifiable %}<td>{% if not p.payee %}
+          <form class="form-ligne" method="post" action="{{ url_for('payer_penalite', id_tontine=tontine.id, id_penalite=p.id) }}">
+            <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+            <button class="btn petit" type="submit">Marquer payée</button>
+          </form>{% endif %}</td>{% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}<p class="mut">Aucune pénalité dans ce cycle.</p>{% endif %}
+{% endif %}
+{% endblock %}

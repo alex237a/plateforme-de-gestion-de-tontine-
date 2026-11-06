@@ -1,0 +1,31 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Transparence · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Transparence</h1>
+<p class="lead">Pour chaque séance passée : ce qui a été collecté, comparé à ce qui était attendu, et le statut payé ou non payé de chaque membre. Aucun montant individuel n'est montré.</p>
+{% if cycle is none or not seances %}
+<p class="mut">Aucune séance passée pour le moment.</p>
+{% else %}
+<div class="liste-transparence">
+  {% for s in seances %}
+  {% set pct = (100 * s.collecte / s.attendu)|round|int if s.attendu else 0 %}
+  <article class="carte">
+    <div class="seance-tete">
+      <h2 class="petit-titre">Séance n° {{ s.numero }} · {{ s.date|date_fr }}</h2>
+      {% if s.collecte >= s.attendu %}<span class="badge vert">Complète</span>{% else %}<span class="badge rouge">Incomplète</span>{% endif %}
+    </div>
+    <p><strong>{{ s.collecte|fcfa }}</strong> collectés sur {{ s.attendu|fcfa }} attendus ({{ pct }} %)</p>
+    <div class="barre{% if s.collecte < s.attendu %} or{% endif %}" data-pct="{{ pct }}" role="progressbar" aria-label="Montant collecté à la séance {{ s.numero }}" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+    <details>
+      <summary>Voir qui a payé ({{ s.nb_payeurs }} sur {{ statuts[s.id]|length }})</summary>
+      <ul class="statuts">
+        {% for ligne in statuts[s.id] %}
+        <li><span>{{ ligne.nom }}</span>{% if ligne.paye %}<span class="badge vert">Payé</span>{% else %}<span class="badge rouge">Non payé</span>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </details>
+  </article>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

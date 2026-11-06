@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titre %}Connexion · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap etroit">
+  <h1>Connexion</h1>
+  <p class="lead">Entrez votre numéro de téléphone et votre code d'accès.</p>
+  <form id="form-connexion" class="carte formulaire" method="post" action="{{ url_for('connexion') }}" novalidate>
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <input type="hidden" name="suivant" value="{{ suivant }}">
+    <div class="champ"><label for="telephone">Téléphone</label>
+      <input id="telephone" name="telephone" type="tel" inputmode="numeric" autocomplete="username" placeholder="6XX XX XX XX" required>
+      <p class="erreur-champ" id="err-telephone" role="alert"></p></div>
+    <div class="champ"><label for="code">Code d'accès</label>
+      <input id="code" name="code" type="password" autocomplete="current-password" required>
+      <p class="erreur-champ" id="err-code" role="alert"></p></div>
+    <button class="btn" type="submit">Se connecter</button>
+  </form>
+  <p class="mut">Pas encore de compte ? <a class="lien" href="{{ url_for('inscription') }}">Inscrivez-vous</a>.</p>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/formulaires.js') }}" defer></script>{% endblock %}

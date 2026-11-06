@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titre %}Erreur du serveur · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap erreur-page">
+  <p class="code-erreur">500</p>
+  <h1>Un problème est survenu</h1>
+  <p class="lead">Le serveur n'a pas pu traiter votre demande. Réessayez dans un instant.</p>
+  <p><a class="btn" href="{{ url_for('accueil') }}">Retour à l'accueil</a></p>
+</section>
+{% endblock %}

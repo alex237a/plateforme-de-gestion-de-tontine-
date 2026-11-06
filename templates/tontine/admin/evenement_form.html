@@ -1,0 +1,32 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Nouvel événement · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Créer un événement</h1>
+<p class="lead">Les membres seront prévenus. Les contributions sont libres : personne n'est obligé de cotiser.</p>
+<form id="form-evenement" class="carte formulaire etroit" method="post" action="{{ url_for('creer_evenement', id_tontine=tontine.id) }}" novalidate>
+  <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+  <fieldset{% if not tontine_modifiable %} disabled{% endif %}>
+    <div class="champ"><label for="titre">Titre</label>
+      <input id="titre" name="titre" type="text" maxlength="80" value="{{ valeurs.titre }}" required>
+      <p class="erreur-champ" id="err-titre" role="alert"></p></div>
+    <div class="champ"><label for="type">Type d'événement</label>
+      <select id="type" name="type">{% for cle, libelle in TYPES_EVENEMENT.items() %}<option value="{{ cle }}"{% if valeurs.type == cle %} selected{% endif %}>{{ libelle }}</option>{% endfor %}</select></div>
+    <div class="champ"><label for="description">Description (500 caractères au plus)</label>
+      <textarea id="description" name="description" rows="3" maxlength="500">{{ valeurs.description }}</textarea></div>
+    <div class="champ"><label for="date_evenement">Date de l'événement</label>
+      <input id="date_evenement" name="date_evenement" type="date" value="{{ valeurs.date_evenement }}" required>
+      <p class="erreur-champ" id="err-date_evenement" role="alert"></p></div>
+    <div class="champ"><label for="date_limite">Dernier jour pour contribuer (facultatif)</label>
+      <input id="date_limite" name="date_limite" type="date" value="{{ valeurs.date_limite or '' }}"></div>
+    <div class="champ"><label for="concerne_id">Membre concerné (facultatif)</label>
+      <select id="concerne_id" name="concerne_id"><option value="">— aucun —</option>
+        {% for m in membres %}<option value="{{ m.id }}"{% if valeurs.concerne_id == m.id %} selected{% endif %}>{{ m.nom }}</option>{% endfor %}</select></div>
+    <div class="champ"><label for="objectif">Objectif à atteindre en FCFA (facultatif)</label>
+      <input id="objectif" name="objectif" type="number" min="1000" step="1000" value="{{ valeurs.objectif or '' }}"></div>
+    <div class="champ"><label for="montant_suggere">Montant suggéré en FCFA (facultatif)</label>
+      <input id="montant_suggere" name="montant_suggere" type="number" min="500" step="100" value="{{ valeurs.montant_suggere or '' }}"></div>
+    {% if tontine_modifiable %}<button class="btn" type="submit">Créer l'événement</button>{% endif %}
+  </fieldset>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/formulaires.js') }}" defer></script>{% endblock %}

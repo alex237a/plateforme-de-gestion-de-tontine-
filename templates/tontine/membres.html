@@ -1,0 +1,22 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Membres · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Membres</h1>
+<form class="recherche" method="get" action="{{ url_for('tontine_membres', id_tontine=tontine.id) }}" role="search">
+  <label for="q">Rechercher un membre par nom</label>
+  <input id="q" name="q" type="search" value="{{ q }}" maxlength="60" autocomplete="off" placeholder="Nom du membre">
+  <button class="btn ghost petit" type="submit">Chercher</button>
+</form>
+<p class="mut" id="compte-membres" role="status">{{ membres|length }} membre{{ 's' if membres|length > 1 }}</p>
+<div class="tableau-defile">
+  <table id="table-membres" data-api="{{ url_for('api_membres', id_tontine=tontine.id) }}" data-telephone="{{ '1' if gestionnaire else '0' }}">
+    <thead><tr><th scope="col">Nom</th><th scope="col">Rôle</th>{% if gestionnaire %}<th scope="col">Téléphone</th>{% endif %}<th scope="col">Membre depuis</th></tr></thead>
+    <tbody id="corps-membres">
+    {% for m in membres %}
+      <tr><td>{{ m.nom }}</td><td><span class="badge role-{{ m.role }}">{{ ROLES[m.role] }}</span></td>{% if gestionnaire %}<td>{{ m.telephone }}</td>{% endif %}<td>{{ m.date_adhesion|date_fr }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/membres.js') }}" defer></script>{% endblock %}

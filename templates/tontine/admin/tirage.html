@@ -1,0 +1,23 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Tirage au sort · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Tirage au sort des bénéficiaires</h1>
+<p class="lead">Cycle « {{ cycle.nom }} » : {{ seances|length }} séances.</p>
+{% if libres and tontine_modifiable and cycle.statut != 'termine' %}
+<form class="carte formulaire etroit" method="post" action="{{ url_for('faire_tirage', id_tontine=tontine.id, id_cycle=cycle.id) }}">
+  <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+  <p>{{ libres }} séance{{ 's' if libres > 1 }} sans bénéficiaire. Le tirage attribue ces places au hasard parmi les membres qui n'ont pas encore reçu la cagnotte.</p>
+  <button class="btn" type="submit">Lancer le tirage au sort</button>
+</form>
+{% endif %}
+<p id="etat-tirage" class="mut" role="status"></p>
+<ol class="tirage-liste" id="tirage-liste"{% if animation %} data-animation="1"{% endif %}>
+  {% for s in seances %}
+  <li data-nom="{{ s.beneficiaire_nom or '' }}">
+    <span class="rang">Séance n° {{ s.numero }} · {{ s.date|date_fr }}</span>
+    <strong class="nom-tire">{{ s.beneficiaire_nom or 'Pas encore tiré' }}</strong>
+  </li>
+  {% endfor %}
+</ol>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/tirage.js') }}" defer></script>{% endblock %}

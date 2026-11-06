@@ -1,0 +1,28 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Événements · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Événements</h1>
+<p class="lead">Mariages, deuils, naissances, fêtes : les membres peuvent contribuer. La contribution est libre : rien n'est obligatoire, chacun participe s'il le souhaite et du montant qu'il veut.</p>
+{% if gestionnaire and tontine_modifiable %}<p><a class="btn" href="{{ url_for('formulaire_evenement', id_tontine=tontine.id) }}">Créer un événement</a></p>{% endif %}
+{% if evenements %}
+<div class="grille-tontines cascade">
+  {% for e in evenements %}
+  <article class="carte carte-evenement">
+    <div class="seance-tete">
+      <span class="badge or">{{ TYPES_EVENEMENT[e.type] }}</span>
+      {% if e.accepte %}<span class="badge vert">Ouvert</span>{% else %}<span class="badge rouge">Clos</span>{% endif %}
+    </div>
+    <h2 class="petit-titre"><a href="{{ url_for('page_evenement', id_tontine=tontine.id, id_evenement=e.id) }}">{{ e.titre }}</a></h2>
+    <p class="mut">{{ e.date_evenement|date_fr }}{% if e.concerne_nom %} · {{ e.concerne_nom }}{% endif %}</p>
+    {% if e.pourcentage is not none %}
+    <div class="barre" data-pct="{{ e.pourcentage }}" role="progressbar" aria-label="Objectif de l'événement {{ e.titre }}" aria-valuenow="{{ e.pourcentage }}" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+    {% endif %}
+    <p><strong>{{ e.total|fcfa }}</strong> collectés{% if e.objectif %} sur {{ e.objectif|fcfa }}{% endif %} · {{ e.nb_contributeurs }} contributeur{{ 's' if e.nb_contributeurs > 1 }}</p>
+    <a class="btn petit{% if not e.accepte %} ghost{% endif %}" href="{{ url_for('page_evenement', id_tontine=tontine.id, id_evenement=e.id) }}">{{ 'Contribuer' if e.accepte else 'Voir' }}</a>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<p class="carte">Aucun événement pour le moment.</p>
+{% endif %}
+{% endblock %}

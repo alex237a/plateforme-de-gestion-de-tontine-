@@ -1,0 +1,59 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Paiement {{ paiement.reference }} · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Paiement {{ OPERATEURS[paiement.operateur] }}</h1>
+<div class="deux-colonnes">
+  <section class="carte" aria-labelledby="titre-recap">
+    <h2 class="petit-titre" id="titre-recap">Récapitulatif</h2>
+    <dl class="infos">
+      <div><dt>Référence</dt><dd>{{ paiement.reference }}</dd></div>
+      <div><dt>Compte débité</dt><dd>{{ OPERATEURS[paiement.operateur] }} · {{ paiement.telephone }}</dd></div>
+      <div><dt>Montant</dt><dd>{{ paiement.montant|fcfa }}</dd></div>
+      <div><dt>Statut</dt><dd><span class="badge {{ 'vert' if paiement.statut == 'reussi' else 'rouge' if paiement.statut == 'echoue' else 'or' }}">{{ STATUTS_PAIEMENT[paiement.statut] }}</span></dd></div>
+    </dl>
+    <ul class="liste-simple">
+      {% for l in lignes %}
+      <li>{% if l.type == 'evenement' %}Contribution à l'événement « {{ l.evenement }} »{% elif l.type == 'cotisation' %}Cotisation de la séance n° {{ l.numero }}{% else %}Pénalité ({{ MOTIFS[l.motif]|lower }}), séance n° {{ l.numero }}{% endif %} : <strong>{{ l.montant|fcfa }}</strong></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="carte zone-paiement" id="zone-paiement" data-statut="{{ paiement.statut }}" data-secondes="{{ secondes }}"
+           data-api="{{ url_for('api_statut_paiement', id_tontine=tontine.id, id_paiement=paiement.id) }}" aria-live="polite">
+    {% if paiement.statut == 'en_attente' %}
+    <div class="ussd {{ paiement.operateur }}">
+      <p class="ussd-marque">{{ OPERATEURS[paiement.operateur] }}</p>
+      <p>Une demande de paiement de <strong>{{ paiement.montant|fcfa }}</strong> a été envoyée au <strong>{{ paiement.telephone }}</strong>. Saisissez votre code secret pour confirmer.</p>
+    </div>
+    <p class="attente-message" id="attente-message" hidden><span class="spinner" aria-hidden="true"></span> En attente de la demande sur votre téléphone…</p>
+    <form id="form-pin" method="post" action="{{ url_for('confirmer_paiement', id_tontine=tontine.id, id_paiement=paiement.id) }}" novalidate>
+      <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+      <div class="champ">
+        <label for="pin">Code secret à 4 chiffres</label>
+        <input id="pin" name="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" required>
+        <p class="erreur-champ" id="err-pin" role="alert"></p>
+      </div>
+      <button class="btn" type="submit">Confirmer le paiement</button>
+    </form>
+    <form class="espace-haut" method="post" action="{{ url_for('annuler_paiement', id_tontine=tontine.id, id_paiement=paiement.id) }}">
+      <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+      <button class="btn ghost petit" type="submit">Annuler</button>
+    </form>
+    <p class="mut espace-haut">Temps restant : <strong id="compte-rebours">{{ secondes // 60 }}:{{ '%02d' % (secondes % 60) }}</strong>. Simulation : un code à 4 chiffres confirme le paiement, le code 0000 simule un solde insuffisant.</p>
+    {% elif paiement.statut == 'reussi' %}
+    <p class="icone-statut reussi" aria-hidden="true">✓</p>
+    <h2 class="petit-titre">Paiement réussi</h2>
+    <p class="mut">Vos sommes sont réglées et visibles dans la tontine. Conservez la référence {{ paiement.reference }}.</p>
+    <p class="actions-barre"><a class="btn" href="{{ url_for('mon_espace', id_tontine=tontine.id) }}">Mon espace</a>
+      <a class="btn ghost" href="{{ url_for('mes_paiements', id_tontine=tontine.id) }}">Mes paiements</a></p>
+    {% else %}
+    <p class="icone-statut echoue" aria-hidden="true">✕</p>
+    <h2 class="petit-titre">Paiement échoué</h2>
+    <p class="mut">{{ paiement.motif_echec or 'Le paiement n\'a pas abouti.' }}</p>
+    <p class="actions-barre"><a class="btn" href="{{ url_for('payer', id_tontine=tontine.id) }}">Réessayer</a>
+      <a class="btn ghost" href="{{ url_for('mes_paiements', id_tontine=tontine.id) }}">Mes paiements</a></p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/paiement.js') }}" defer></script>{% endblock %}

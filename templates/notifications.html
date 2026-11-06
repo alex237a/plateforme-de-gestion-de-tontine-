@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titre %}Notifications · Njangi+{% endblock %}
+{% block contenu %}
+<section class="wrap etroit">
+  <h1>Notifications</h1>
+  {% if nb_notifications %}
+  <form method="post" action="{{ url_for('marquer_notifications_lues') }}" class="actions-barre">
+    <input type="hidden" name="csrf" value="{{ jeton_csrf() }}">
+    <button class="btn ghost petit" type="submit">Tout marquer comme lu</button>
+  </form>
+  {% endif %}
+  {% if lignes %}
+  <ul class="liste-notifications">
+    {% for n in lignes %}
+    <li class="carte{% if not n.lue %} non-lue{% endif %}">
+      <p>{{ n.message }}</p>
+      <p class="mut">{% if n.tontine_nom %}{{ n.tontine_nom }} · {% endif %}{{ n.date_creation|horodatage }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}<p class="mut">Aucune notification pour le moment.</p>{% endif %}
+</section>
+{% endblock %}

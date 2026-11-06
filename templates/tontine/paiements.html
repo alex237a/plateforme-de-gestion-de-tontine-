@@ -1,0 +1,21 @@
+{% extends "tontine/base_tontine.html" %}
+{% block titre %}Mes paiements · {{ tontine.nom }} · Njangi+{% endblock %}
+{% block corps %}
+<h1>Mes paiements</h1>
+<p class="lead">Vos paiements par Orange Money et MTN MoMo dans cette tontine.</p>
+{% if tontine_modifiable %}<p><a class="btn" href="{{ url_for('payer', id_tontine=tontine.id) }}">Régler mes sommes</a></p>{% endif %}
+{% if paiements %}
+<div class="tableau-defile">
+  <table>
+    <thead><tr><th scope="col">Date</th><th scope="col">Référence</th><th scope="col">Moyen</th><th scope="col">Montant</th><th scope="col">Statut</th><th scope="col">Détail</th></tr></thead>
+    <tbody>
+    {% for p in paiements %}
+      <tr><td>{{ p.date_creation|horodatage }}</td><td>{{ p.reference }}</td><td><span class="badge operateur-{{ p.operateur }}">{{ OPERATEURS[p.operateur] }}</span></td><td>{{ p.montant|fcfa }}</td>
+        <td><span class="badge {{ 'vert' if p.statut == 'reussi' else 'rouge' if p.statut == 'echoue' else 'or' }}">{{ STATUTS_PAIEMENT[p.statut] }}</span></td>
+        <td><a href="{{ url_for('page_paiement', id_tontine=tontine.id, id_paiement=p.id) }}">Voir</a></td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}<p class="mut">Aucun paiement pour le moment.</p>{% endif %}
+{% endblock %}
